@@ -22,13 +22,12 @@ import 'package:notes_final_version/app/modules/notes/models/notes_model.dart';
 import 'package:notes_final_version/app/modules/notes/views/create_note.dart';
 import 'package:notes_final_version/app/modules/notes/widgets/home_search_widget.dart';
 import 'package:notes_final_version/app/modules/notes/widgets/quill/embeds/timestamp_embed.dart';
-import 'package:notes_final_version/app/utils/color_helper.dart';
-import 'package:notes_final_version/app/utils/constants.dart';
-import 'package:notes_final_version/app/utils/extensions.dart';
+import 'package:notes_final_version/app/utils/utils.dart';
 
 class NoteCards extends StatelessWidget {
   String? folderName;
   String? labelName;
+
   NoteCards({super.key, this.folderName, this.labelName});
 
   final NotesController notesController = Get.find();
@@ -79,7 +78,7 @@ class NoteCards extends StatelessWidget {
               : Column(
                   children: [
                     HomeSearchWidget(),
-                    15.SpaceX,
+                    15.spaceY,
                     Expanded(
                       child: MasonryGridView.builder(
                           physics: const BouncingScrollPhysics(),
@@ -102,11 +101,11 @@ class NoteCards extends StatelessWidget {
                                     notesController.searchedNotesList.isNotEmpty
                                 ? notesController.searchedNotesList[index]
                                 : notesController.notesList[index];
-                            var json = jsonDecode(noteData!.document);
-                            final controller = quill.QuillController(
-                                document: quill.Document.fromJson(json),
-                                selection:
-                                    const TextSelection.collapsed(offset: 0));
+
+                            if (noteData == null) {
+                              return const Text("Note is null");
+                            }
+
                             return FocusedMenuHolder(
                               menuWidth: 200,
                               menuOffset: 10,
@@ -116,24 +115,7 @@ class NoteCards extends StatelessWidget {
                               animateMenuItems: false,
                               blurBackgroundColor: ColorHelper.blackColor,
                               onPressed: () {
-                                print("notedatalabesl${noteData.labels}");
-                                notesController.quillController.document =
-                                    quill.Document.fromJson(json);
-                                notesController.titleController.text =
-                                    noteData.title;
-                                notesController.selectedFolder.value =
-                                    noteData.folder;
-                                notesController.labels.value = [];
-
-                                print(
-                                    "notedatalabesl${notesController.labels.value}");
-                                notesController.labels.addAll(noteData.labels);
-                                print(
-                                    "notedatalabesl${notesController.labels.value}");
-                                Get.to(CreateNote(
-                                    updateNote: noteData,
-                                    folderName: folderName,
-                                    labelName: labelName));
+                                navigateToNoteEditScreen(noteData);
                               },
                               menuItems: [
                                 FocusedMenuItem(
@@ -145,18 +127,7 @@ class NoteCards extends StatelessWidget {
                                           color: ColorHelper.blackColor),
                                     ),
                                     onPressed: () {
-                                      notesController.quillController.document =
-                                          quill.Document.fromJson(json);
-                                      notesController.titleController.text =
-                                          noteData.title;
-                                      notesController.selectedFolder.value =
-                                          noteData.folder;
-                                      notesController.labels.value =
-                                          noteData.labels;
-                                      Get.to(CreateNote(
-                                          updateNote: noteData,
-                                          folderName: folderName,
-                                          labelName: labelName));
+                                      navigateToNoteEditScreen(noteData);
                                     },
                                     backgroundColor: ColorHelper.primaryColor),
                                 FocusedMenuItem(
@@ -190,6 +161,35 @@ class NoteCards extends StatelessWidget {
                                       noteData.isPinned = !noteData.isPinned;
                                       notesController.addUpdateNote(noteData,
                                           folderName: folderName);
+                                    },
+                                    backgroundColor: ColorHelper.primaryColor),
+                                FocusedMenuItem(
+                                    trailingIcon: const Icon(Icons.push_pin,
+                                        color: ColorHelper.blackColor),
+                                    title: Text(
+                                      noteData.encrypted
+                                          ? 'Decrypt'
+                                          : 'Encrypt',
+                                      style: const TextStyle(
+                                          color: ColorHelper.blackColor),
+                                    ),
+                                    onPressed: () async {
+                                      // noteData.isPinned = !noteData.isPinned;
+                                      // notesController.addUpdateNote(noteData,
+                                      //     folderName: folderName);
+                                      if (noteData.encrypted) {
+                                        // permanently decrypt
+
+                                        notesController.performDecryption(
+                                            noteData: noteData,
+                                            folderName: folderName,
+                                            updateNoteInstance: true);
+                                      } else {
+                                        // permanently encrypt
+                                        notesController.performEncryption(
+                                            noteData,
+                                            folderName: folderName);
+                                      }
                                     },
                                     backgroundColor: ColorHelper.primaryColor),
                                 FocusedMenuItem(
@@ -236,89 +236,23 @@ class NoteCards extends StatelessWidget {
                                         const SizedBox(
                                           height: 15,
                                         ),
-                                        ShaderMask(
-                                          shaderCallback: ((bounds) {
-                                            return const LinearGradient(
-                                                begin: Alignment.center,
-                                                end: Alignment.bottomCenter,
-                                                colors: [
-                                                  ColorHelper.blackColor,
-                                                  ColorHelper.blackColor,
-                                                  Colors.transparent
-                                                ]).createShader(bounds);
-                                          }),
-                                          child: quill.QuillEditor.basic(
-                                            configurations:
-                                                quill.QuillEditorConfigurations(
-                                              embedBuilders: [
-                                                ...(isWeb()
-                                                    ? FlutterQuillEmbeds
-                                                        .editorWebBuilders()
-                                                    : FlutterQuillEmbeds
-                                                        .editorBuilders(
-                                                        imageEmbedConfigurations:
-                                                            QuillEditorImageEmbedConfigurations(
-                                                          imageErrorWidgetBuilder:
-                                                              (context, error,
-                                                                  stackTrace) {
-                                                            return Text(
-                                                              'Error while loading an image: ${error.toString()}',
-                                                            );
-                                                          },
-                                                          imageProviderBuilder:
-                                                              (context,
-                                                                  imageUrl) {
-                                                            // cached_network_image is supported
-                                                            // only for Android, iOS and web
-
-                                                            // We will use it only if image from network
-                                                            if (isAndroid(
-                                                                    supportWeb:
-                                                                        false) ||
-                                                                isIOS(
-                                                                    supportWeb:
-                                                                        false) ||
-                                                                isWeb()) {
-                                                              if (isHttpBasedUrl(
-                                                                  imageUrl)) {
-                                                                return CachedNetworkImageProvider(
-                                                                  imageUrl,
-                                                                );
-                                                              }
-                                                            }
-                                                            return getImageProviderByImageSource(
-                                                              imageUrl,
-                                                              imageProviderBuilder:
-                                                                  null,
-                                                              context: context,
-                                                              assetsPrefix: QuillSharedExtensionsConfigurations.get(
-                                                                      context:
-                                                                          context)
-                                                                  .assetsPrefix,
-                                                            );
-                                                          },
-                                                        ),
-                                                      )),
-                                                TimeStampEmbedBuilderWidget(),
-                                              ],
-                                              controller: controller,
-                                              padding: const EdgeInsets.only(
-                                                  bottom: 10),
-                                              autoFocus: true,
-                                              enableInteractiveSelection: false,
-                                              readOnly: true,
-                                              showCursor: false,
-                                              scrollPhysics:
-                                                  const NeverScrollableScrollPhysics(),
-                                              scrollable: true,
-                                              expands: false,
-                                              maxHeight: 150,
-                                            ),
-                                            scrollController: ScrollController(
-                                                keepScrollOffset: false),
-                                            focusNode: FocusNode(),
-                                          ),
-                                        ),
+                                        noteData.encrypted
+                                            ? const Text("Note is encrypted ")
+                                            : ShaderMask(
+                                                shaderCallback: ((bounds) {
+                                                  return const LinearGradient(
+                                                      begin: Alignment.center,
+                                                      end: Alignment
+                                                          .bottomCenter,
+                                                      colors: [
+                                                        ColorHelper.blackColor,
+                                                        ColorHelper.blackColor,
+                                                        Colors.transparent
+                                                      ]).createShader(bounds);
+                                                }),
+                                                child:
+                                                    shaderMaskChild(noteData),
+                                              ),
                                         Row(
                                           children: [
                                             Text(
@@ -363,5 +297,104 @@ class NoteCards extends StatelessWidget {
         }),
       ),
     );
+  }
+
+  encryptedNoteBuild(NoteModel noteData) {
+    return Container(
+      height: 100,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: ColorHelper.primaryColor),
+      child: Column(
+        children: [
+          const Text("Note is encrypted"),
+          ElevatedButton(onPressed: () {}, child: Text("View")),
+        ],
+      ),
+    );
+  }
+
+  shaderMaskChild(NoteModel noteData) {
+    var json = jsonDecode(noteData.document);
+
+    final controller = quill.QuillController(
+        document: quill.Document.fromJson(json),
+        selection: const TextSelection.collapsed(offset: 0));
+
+    return quill.QuillEditor.basic(
+      configurations: quill.QuillEditorConfigurations(
+        embedBuilders: [
+          ...(isWeb()
+              ? FlutterQuillEmbeds.editorWebBuilders()
+              : FlutterQuillEmbeds.editorBuilders(
+                  imageEmbedConfigurations: QuillEditorImageEmbedConfigurations(
+                    imageErrorWidgetBuilder: (context, error, stackTrace) {
+                      return Text(
+                        'Error while loading an image: ${error.toString()}',
+                      );
+                    },
+                    imageProviderBuilder: (context, imageUrl) {
+                      // cached_network_image is supported
+                      // only for Android, iOS and web
+
+                      // We will use it only if image from network
+                      if (isAndroid(supportWeb: false) ||
+                          isIOS(supportWeb: false) ||
+                          isWeb()) {
+                        if (isHttpBasedUrl(imageUrl)) {
+                          return CachedNetworkImageProvider(
+                            imageUrl,
+                          );
+                        }
+                      }
+                      return getImageProviderByImageSource(
+                        imageUrl,
+                        imageProviderBuilder: null,
+                        context: context,
+                        assetsPrefix: QuillSharedExtensionsConfigurations.get(
+                                context: context)
+                            .assetsPrefix,
+                      );
+                    },
+                  ),
+                )),
+          TimeStampEmbedBuilderWidget(),
+        ],
+        controller: controller,
+        padding: const EdgeInsets.only(bottom: 10),
+        autoFocus: true,
+        enableInteractiveSelection: false,
+        readOnly: true,
+        showCursor: false,
+        scrollPhysics: const NeverScrollableScrollPhysics(),
+        scrollable: true,
+        expands: false,
+        maxHeight: 150,
+      ),
+      scrollController: ScrollController(keepScrollOffset: false),
+      focusNode: FocusNode(),
+    );
+  }
+
+  navigateToNoteEditScreen(NoteModel noteData) async {
+    // todo decrypt before moving
+    String? decryptedData = noteData.document;
+    if (noteData.encrypted) {
+      decryptedData =
+          await notesController.performDecryption(noteData: noteData);
+      if (decryptedData == null) {
+        // DefaultSnackbar.show('Trouble', "Unable to view due to some error.");
+        return;
+      }
+    }
+
+    var json = jsonDecode(decryptedData);
+
+    notesController.quillController.document = quill.Document.fromJson(json);
+    notesController.titleController.text = noteData.title;
+    notesController.selectedFolder.value = noteData.folder;
+    notesController.labels.value = noteData.labels;
+    Get.to(CreateNote(
+        updateNote: noteData, folderName: folderName, labelName: labelName));
   }
 }

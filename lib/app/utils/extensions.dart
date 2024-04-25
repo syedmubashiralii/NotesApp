@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 extension SpaceXY on int {
-  SizedBox get SpaceX => SizedBox(
+  SizedBox get spaceY => SizedBox(
         height: toDouble(),
       );
 
-  SizedBox get SpaceY => SizedBox(
+  SizedBox get spaceX => SizedBox(
         width: toDouble(),
       );
 }

@@ -6,8 +6,10 @@ import 'package:notes_final_version/app/utils/helper_functions.dart';
 
 import '../controllers/todo_controller.dart';
 
+// binding means
 class TodoView extends GetView<TodoController> {
   const TodoView({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

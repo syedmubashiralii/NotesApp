@@ -5,7 +5,7 @@ part 'notes_model.g.dart';
 @HiveType(typeId: 0)
 class NoteModel {
   @HiveField(0)
-  final String document;
+  String document;
   @HiveField(1)
   final String title;
   @HiveField(2)
@@ -19,9 +19,13 @@ class NoteModel {
   @HiveField(6)
   bool isPinned;
   @HiveField(7)
-  final String searchableDocument;
+  String searchableDocument;
   @HiveField(8)
   List<String> labels;
+  @HiveField(9)
+  bool encrypted;
+  @HiveField(10)
+  bool edited;
 
   NoteModel(
       {required this.document,
@@ -32,7 +36,9 @@ class NoteModel {
       required this.folder,
       required this.date,
       required this.uid,
-      required this.labels});
+      required this.labels,
+      this.edited = false,
+      this.encrypted = false});
 
   Map<String, dynamic> toJson() {
     return {
@@ -44,20 +50,25 @@ class NoteModel {
       'uid': uid,
       'document': document,
       'searchableDocument': searchableDocument,
-      'labels': labels
+      'labels': labels,
+      'edited': edited,
+      'encrypted': encrypted,
     };
   }
 
   factory NoteModel.fromJson(Map<String, dynamic> json) {
     return NoteModel(
-        document: json['document'],
-        searchableDocument: json['searchableDocument'],
-        title: json['title'],
-        isArchived: json['isArchived'],
-        isPinned: json['isPinned'],
-        folder: json['folder'],
-        date: DateTime.parse(json['date']),
-        uid: json['uid'],
-        labels: json['labels']);
+      document: json['document'],
+      searchableDocument: json['searchableDocument'],
+      title: json['title'],
+      isArchived: json['isArchived'],
+      isPinned: json['isPinned'],
+      folder: json['folder'],
+      date: DateTime.parse(json['date']),
+      uid: json['uid'],
+      labels: json['labels'],
+      edited: json.containsKey('edited') ? json['edited'] : false,
+      encrypted: json.containsKey('encrypted') ? json['encrypted'] : false,
+    );
   }
 }

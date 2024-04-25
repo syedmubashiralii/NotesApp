@@ -29,7 +29,7 @@ class ReminderModelAdapter extends TypeAdapter<ReminderModel> {
       isExpanded: fields[4] as bool,
       headerValue: fields[6] as String,
       toggle: fields[9] as bool,
-      time: TimeOfDayAdapter().read(reader),
+      time: fields[12] as TimeOfDay,
     );
   }
 

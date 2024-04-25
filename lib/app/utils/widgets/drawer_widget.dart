@@ -17,13 +17,13 @@ import 'package:notes_final_version/app/utils/widgets/custom_nav_item.dart';
 import 'package:uuid/uuid.dart';
 
 class DrawerScreen extends StatelessWidget {
-  DrawerScreen({Key? key}) : super(key: key);
-
-  LabelsController labelsController = Get.find();
-  NotesController notesController = Get.find();
+  const DrawerScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final LabelsController labelsController = Get.find();
+    final NotesController notesController = Get.find();
+
     return Material(
       child: Container(
         padding: const EdgeInsets.all(6),
@@ -34,7 +34,7 @@ class DrawerScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            10.SpaceX,
+            10.spaceY,
             InkWell(
               onTap: () => notesController.toggleDrawer(),
               child: CircleAvatar(
@@ -42,9 +42,9 @@ class DrawerScreen extends StatelessWidget {
                 child: const Icon(Icons.close, color: Colors.black),
               ),
             ),
-            10.SpaceX,
+            10.spaceY,
             Image.asset(ImageAsset.notesIcon),
-            15.SpaceX,
+            15.spaceY,
             CustomNavTile(
                 title: 'Notes',
                 icon: Icons.home_outlined,
@@ -52,7 +52,7 @@ class DrawerScreen extends StatelessWidget {
                 onTap: () {
                   notesController.toggleDrawer();
                 }),
-            5.SpaceX,
+            5.spaceY,
             CustomNavTile(
                 title: 'Todos',
                 icon: FontAwesomeIcons.checkSquare,
@@ -60,7 +60,7 @@ class DrawerScreen extends StatelessWidget {
                 onTap: () {
                   Get.toNamed(Routes.TODO);
                 }),
-            5.SpaceX,
+            5.spaceY,
             CustomNavTile(
                 title: 'Reminder',
                 icon: FontAwesomeIcons.clock,
@@ -68,7 +68,7 @@ class DrawerScreen extends StatelessWidget {
                 onTap: () {
                   Get.toNamed(Routes.REMINDERS);
                 }),
-            5.SpaceX,
+            5.spaceY,
             CustomNavTile(
                 title: 'Archived Notes',
                 icon: Icons.archive_outlined,
@@ -83,7 +83,7 @@ class DrawerScreen extends StatelessWidget {
                   Get.to(ArchivedNotes(),
                       transition: Transition.downToUp, curve: Curves.easeInOut);
                 }),
-            5.SpaceX,
+            5.spaceY,
             CustomNavTile(
                 title: 'Labels',
                 icon: Icons.label_outline,
@@ -104,17 +104,17 @@ class DrawerScreen extends StatelessWidget {
                   Get.to(LabelsView(),
                       transition: Transition.downToUp, curve: Curves.easeInOut);
                 }),
-            5.SpaceX,
+            5.spaceY,
             Divider(
               color: ColorHelper.primaryColor,
             ),
-            5.SpaceX,
+            5.spaceY,
             CustomNavTile(
                 title: 'Settings',
                 icon: FontAwesomeIcons.cogs,
                 selected: true,
                 onTap: () {
-                  Get.to(SettingsView(),
+                  Get.to(() => SettingsView(),
                       transition: Transition.downToUp, curve: Curves.easeInOut);
                 }),
           ],

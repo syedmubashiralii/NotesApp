@@ -16,6 +16,8 @@ import 'package:printing/printing.dart';
 import 'package:quill_pdf_converter/quill_pdf_converter.dart';
 import 'package:uuid/uuid.dart';
 
+import '../models/note_plaintext_model.dart';
+
 class CreateNote extends StatelessWidget {
   CreateNote({super.key, this.updateNote, this.folderName, this.labelName});
 
@@ -69,29 +71,48 @@ class CreateNote extends StatelessWidget {
                           color: Colors.black,
                         )),
                     IconButton(
-                        onPressed: () {
-                          String json = jsonEncode(notesController
+                        onPressed: () async {
+                          String? json = jsonEncode(notesController
                               .quillController.document
                               .toDelta()
                               .toJson());
+
                           String plainText = jsonEncode(notesController
                               .quillController.document
                               .toPlainText());
+
+                          if (updateNote != null) {
+                            if (updateNote!.encrypted) {
+                              NotePlaintextModel? encText =
+                                  await notesController.encryptNoteBeforeSaving(
+                                      json, plainText);
+                              if (encText != null) {
+                                json = encText.note;
+                                plainText = encText.plaintext;
+                              }
+                            }
+                          }
+
                           final String uid = const Uuid().v4();
                           NoteModel note = NoteModel(
-                              document: json,
-                              searchableDocument: plainText,
-                              title: notesController.titleController.text,
-                              isArchived: updateNote != null
-                                  ? updateNote!.isArchived
-                                  : false,
-                              isPinned: updateNote != null
-                                  ? updateNote!.isPinned
-                                  : false,
-                              folder: notesController.selectedFolder.value,
-                              date: DateTime.now(),
-                              uid: updateNote != null ? updateNote!.uid : uid,
-                              labels: notesController.labels.value);
+                            document: json,
+                            searchableDocument: plainText,
+                            title: notesController.titleController.text,
+                            isArchived: updateNote != null
+                                ? updateNote!.isArchived
+                                : false,
+                            isPinned: updateNote != null
+                                ? updateNote!.isPinned
+                                : false,
+                            folder: notesController.selectedFolder.value,
+                            date: DateTime.now(),
+                            uid: updateNote != null ? updateNote!.uid : uid,
+                            labels: notesController.labels.value,
+                            edited: true,
+                            encrypted: updateNote != null
+                                ? updateNote!.encrypted
+                                : false,
+                          );
                           notesController.addUpdateNote(note,
                               folderName: folderName, labelName: labelName);
                           Get.back();

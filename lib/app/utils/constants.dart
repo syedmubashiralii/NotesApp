@@ -35,3 +35,8 @@ class ImageAsset {
   static const String filterIcon = "$assetImagePath/filter.svg";
   static const String notesIcon = '$assetImagePath/icons8-notes.png';
 }
+
+class MapKeys {
+  static String selectedProductImageList = "selectedProductImageList";
+  static String selectedProductId = "selectedProductId";
+}

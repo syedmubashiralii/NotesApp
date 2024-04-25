@@ -155,7 +155,7 @@ class NoteHeader extends StatelessWidget {
                                             child: Text(notesController
                                                 .labels[i][0]
                                                 .toString())),
-                                        5.SpaceY,
+                                        5.spaceX,
                                         Text(notesController.labels[i]),
                                       ],
                                     ),

@@ -1,15 +1,16 @@
 import 'dart:io' as io show Directory, File;
+import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart'
     show CachedNetworkImageProvider;
-import 'package:desktop_drop/desktop_drop.dart' show DropTarget;
+// todo khurram have removed desktop drop
+// import 'package:desktop_drop/desktop_drop.dart' show DropTarget;
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/extensions.dart' show isAndroid, isIOS, isWeb;
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill_extensions/embeds/widgets/image.dart'
     show getImageProviderByImageSource, imageFileExtensions;
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
-import 'package:get/get.dart';
 import 'package:path/path.dart' as path;
 
 import 'embeds/timestamp_embed.dart';
@@ -117,32 +118,34 @@ class MyQuillEditor extends StatelessWidget {
                 )),
           TimeStampEmbedBuilderWidget(),
         ],
-        builder: (context, rawEditor) {
-          // The `desktop_drop` plugin doesn't support iOS platform for now
-          if (isIOS(supportWeb: false)) {
-            return rawEditor;
-          }
-          return DropTarget(
-            onDragDone: (details) {
-              final scaffoldMessenger = ScaffoldMessenger.of(context);
-              final file = details.files.first;
-              final isSupported = imageFileExtensions.any(file.name.endsWith);
-              if (!isSupported) {
-                Get.snackbar(
-                  "Notes App",
-                  'Only images are supported right now: ${file.mimeType}, ${file.name}, ${file.path}, $imageFileExtensions',
-                );
 
-                return;
-              }
-              context.requireQuillController.insertImageBlock(
-                imageSource: file.path,
-              );
-              Get.snackbar("Notes App", 'Image is inserted.');
-            },
-            child: rawEditor,
-          );
-        },
+        // todo khurram have commented below code of desktop drop
+        // builder: (context, rawEditor) {
+        //   // The `desktop_drop` plugin doesn't support iOS platform for now
+        //   if (isIOS(supportWeb: false)) {
+        //     return rawEditor;
+        //   }
+        //   return DropTarget(
+        //     onDragDone: (details) {
+        //       final scaffoldMessenger = ScaffoldMessenger.of(context);
+        //       final file = details.files.first;
+        //       final isSupported = imageFileExtensions.any(file.name.endsWith);
+        //       if (!isSupported) {
+        //         Get.snackbar(
+        //           "Notes App",
+        //           'Only images are supported right now: ${file.mimeType}, ${file.name}, ${file.path}, $imageFileExtensions',
+        //         );
+        //
+        //         return;
+        //       }
+        //       context.requireQuillController.insertImageBlock(
+        //         imageSource: file.path,
+        //       );
+        //       Get.snackbar("Notes App", 'Image is inserted.');
+        //     },
+        //     child: rawEditor,
+        //   );
+        // },
       ),
     );
   }

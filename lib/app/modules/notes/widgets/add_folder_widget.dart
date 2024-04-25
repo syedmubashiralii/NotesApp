@@ -69,7 +69,7 @@ class AddFolderBottomSheet extends StatelessWidget {
               thickness: 2,
               color: ColorHelper.primaryColor,
             ),
-            20.SpaceX,
+            20.spaceY,
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8),
               decoration: BoxDecoration(
@@ -107,7 +107,7 @@ class AddFolderBottomSheet extends StatelessWidget {
                 ),
               ),
             ),
-            20.SpaceX,
+            20.spaceY,
             GradientButton(
                 text: "Add",
                 icon: null,
@@ -125,7 +125,7 @@ class AddFolderBottomSheet extends StatelessWidget {
                     Get.back();
                   }
                 }),
-            30.SpaceX,
+            30.spaceY,
           ],
         ),
       ),

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,17 +8,26 @@ import 'package:notes_final_version/app/utils/extensions.dart';
 import 'package:notes_final_version/app/utils/helper_functions.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-class SettingsView extends StatelessWidget {
-  SettingsView({super.key});
+import '../widgets/custom_switch.dart';
 
-  NotesController notesController = Get.find();
+class SettingsView extends StatelessWidget {
+  const SettingsView({super.key});
+
   @override
   Widget build(BuildContext context) {
+    NotesController notesController = Get.find();
+
     RxBool sharingEnabled = true.obs;
-    RxString appVerion = "".obs;
+    RxString appVersion = "".obs;
     PackageInfo.fromPlatform().then((value) {
-      appVerion.value = value.version;
+      appVersion.value = value.version;
     });
+
+    TextStyle heading1Style =
+        GoogleFonts.poppins(fontWeight: FontWeight.w500, fontSize: 15);
+    TextStyle? heading2Style =
+        GoogleFonts.poppins(fontWeight: FontWeight.normal, fontSize: 13);
+
     return Scaffold(
         backgroundColor: ColorHelper.primaryDarkColor,
         appBar: AppBar(
@@ -43,22 +51,18 @@ class SettingsView extends StatelessWidget {
               children: [
                 Text(
                   "Display Options",
-                  style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w500, fontSize: 15),
+                  style: heading1Style,
                 ),
-                10.SpaceX,
+                10.spaceY,
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       "Show Folders",
-                      style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.normal, fontSize: 13),
+                      style: heading2Style,
                     ),
                     Obx(() {
-                      return CupertinoSwitch(
-                          activeColor: ColorHelper.primaryColor,
-                          thumbColor: ColorHelper.primaryColor,
+                      return CustomSwitch(
                           value: notesController.showFolders.value,
                           onChanged: (value) {
                             notesController.showFolders.value = value;
@@ -67,14 +71,13 @@ class SettingsView extends StatelessWidget {
                     })
                   ],
                 ),
-                10.SpaceX,
+                10.spaceY,
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       "Select Theme",
-                      style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.normal, fontSize: 13),
+                      style: heading2Style,
                     ),
                     InkWell(
                       onTap: () {
@@ -87,76 +90,132 @@ class SettingsView extends StatelessWidget {
                     )
                   ],
                 ),
-                20.SpaceX,
+                20.spaceY,
                 Text(
                   "Language",
-                  style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w500, fontSize: 15),
+                  style: heading1Style,
                 ),
-                10.SpaceX,
+                10.spaceY,
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       "App Language",
-                      style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.normal, fontSize: 13),
+                      style: heading2Style,
                     ),
                     Obx(() {
                       return Text(
                         notesController.appLanguage.value,
-                        style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.normal, fontSize: 13),
+                        style: heading2Style,
                       );
                     })
                   ],
                 ),
-                20.SpaceX,
+                20.spaceY,
                 Text(
                   "Sharing",
-                  style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w500, fontSize: 15),
+                  style: heading1Style,
                 ),
-                10.SpaceX,
+                10.spaceY,
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       "Enable Sharing",
-                      style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.normal, fontSize: 13),
+                      style: heading2Style,
                     ),
                     Obx(() {
-                      return CupertinoSwitch(
-                          activeColor: ColorHelper.primaryColor,
-                          thumbColor: ColorHelper.primaryColor,
-                          value: sharingEnabled.value,
+                      return CustomSwitch(
+                        value: sharingEnabled.value,
+                        onChanged: (value) {
+                          sharingEnabled.value = value;
+                        },
+                      );
+                      // CupertinoSwitch(
+                      //   activeColor: ColorHelper.primaryColor,
+                      //   thumbColor: ColorHelper.primaryColor,
+                      //   value: sharingEnabled.value,
+                      //   onChanged:  (value) {
+                      //                           sharingEnabled.value = value;
+                      //                         }
+                      // );
+                    })
+                  ],
+                ),
+                20.spaceY,
+                Text(
+                  "Encrypt / Decrypt",
+                  style: heading1Style,
+                ),
+                10.spaceY,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Allow fingerprint or face",
+                      style: heading2Style,
+                    ),
+                    Obx(() {
+                      return CustomSwitch(
+                          value: notesController.useLocalAuth.value,
                           onChanged: (value) {
-                            sharingEnabled.value = value;
+                            notesController.useLocalAuth.value = value;
+                            notesController.setLocalAuth(value);
                           });
                     })
                   ],
                 ),
-                40.SpaceX,
+                10.spaceY,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Always allow master password",
+                            style: heading2Style,
+                          ),
+                          Text(
+                            "Closing master password means it will be required only once.",
+                            style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.normal,
+                                fontSize: 10,
+                                color: ColorHelper.blackColor.withAlpha(140)),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Obx(() {
+                      return CustomSwitch(
+                          value:
+                              notesController.alwaysRequireMasterPassword.value,
+                          onChanged: (value) {
+                            notesController.alwaysRequireMasterPassword.value =
+                                value;
+                          });
+                    })
+                  ],
+                ),
+                40.spaceY,
                 Text(
                   "About",
-                  style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w500, fontSize: 15),
+                  style: heading1Style,
                 ),
-                10.SpaceX,
+                10.spaceY,
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       "Application version",
-                      style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.normal, fontSize: 13),
+                      style: heading2Style,
                     ),
                     Obx(() {
                       return Text(
-                        appVerion.value,
-                        style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.normal, fontSize: 13),
+                        appVersion.value,
+                        style: heading2Style,
                       );
                     })
                   ],

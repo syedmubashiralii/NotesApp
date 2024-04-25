@@ -20,8 +20,11 @@ class GradientButton extends StatelessWidget {
     return Container(
       width: width,
       height: 50,
-      decoration: ShapeDecoration(
-        shape: const StadiumBorder(),
+      decoration: BoxDecoration(
+        // shape: const StadiumBorder(),
+        borderRadius: BorderRadius.all(
+          Radius.circular(AppConstants.kInputBorderRadius),
+        ),
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,

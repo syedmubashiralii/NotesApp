@@ -26,13 +26,15 @@ class NoteModelAdapter extends TypeAdapter<NoteModel> {
       date: fields[3] as DateTime,
       uid: fields[4] as String,
       labels: (fields[8] as List).cast<String>(),
+      edited: fields[10] as bool,
+      encrypted: fields[9] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, NoteModel obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.document)
       ..writeByte(1)
@@ -50,7 +52,11 @@ class NoteModelAdapter extends TypeAdapter<NoteModel> {
       ..writeByte(7)
       ..write(obj.searchableDocument)
       ..writeByte(8)
-      ..write(obj.labels);
+      ..write(obj.labels)
+      ..writeByte(9)
+      ..write(obj.encrypted)
+      ..writeByte(10)
+      ..write(obj.edited);
   }
 
   @override
