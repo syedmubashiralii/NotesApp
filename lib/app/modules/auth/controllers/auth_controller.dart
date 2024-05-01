@@ -178,4 +178,12 @@ class AuthController extends GetxController implements PasswordCheckController {
   void onClose() {
     super.onClose();
   }
+
+  Future<bool> verifyMasterPasswordStatus() async {
+    return await _storageProvider.verifyMasterPasswordStatus();
+  }
+
+  Future<void> changeMasterPasswordStatus(bool value) async {
+    _storageProvider.changeMasterPasswordStatus(value);
+  }
 }

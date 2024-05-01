@@ -161,6 +161,17 @@ class SettingsView extends StatelessWidget {
                           onChanged: (value) {
                             notesController.useLocalAuth.value = value;
                             notesController.setLocalAuth(value);
+                            // Enabling fingerprint means both master and fingerprint will be enabled
+                            if (value) {
+                              notesController
+                                  .alwaysRequireMasterPassword.value = value;
+                              if (value) {
+                                notesController
+                                    .changeMasterPasswordStatus(true);
+                                notesController.masterPasswordAsked.value =
+                                    false;
+                              }
+                            }
                           });
                     })
                   ],
@@ -195,6 +206,10 @@ class SettingsView extends StatelessWidget {
                           onChanged: (value) {
                             notesController.alwaysRequireMasterPassword.value =
                                 value;
+                            if (value) {
+                              notesController.changeMasterPasswordStatus(true);
+                              notesController.masterPasswordAsked.value = false;
+                            }
                           });
                     })
                   ],

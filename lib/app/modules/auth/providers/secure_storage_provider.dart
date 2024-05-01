@@ -68,4 +68,16 @@ class _SecureStorageProvider {
   deleteSecureData(String key) async {
     await _storage.delete(key: key);
   }
+
+  Future<bool> verifyMasterPasswordStatus() async {
+    String value =
+        await _storage.read(key: 'master_password_enabled') ?? 'true';
+    logInfo('fingerprint_enabled: $value');
+    return value == 'true' ? true : false;
+  }
+
+  Future<void> changeMasterPasswordStatus(bool value) async {
+    await _storage.write(
+        key: 'master_password_enabled', value: value ? 'true' : 'false');
+  }
 }

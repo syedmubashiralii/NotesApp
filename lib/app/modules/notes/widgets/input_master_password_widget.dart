@@ -214,6 +214,8 @@ class InputMasterPasswordBottomSheet extends StatelessWidget {
     if (!fromFingerprint &&
         notesController.alwaysRequireMasterPassword.value == false) {
       notesController.masterPasswordAsked.value = true;
+      //todo   store it in shared prefs also
+      notesController.changeMasterPasswordStatus(false);
     }
     Get.back(result: true);
   }

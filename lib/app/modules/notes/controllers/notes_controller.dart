@@ -252,6 +252,7 @@ class NotesController extends GetxController {
       }
     });
     canUseLocalAuth();
+    verifyMasterPasswordStatus();
     super.onReady();
   }
 
@@ -306,6 +307,9 @@ class NotesController extends GetxController {
           bool canDecrypt = await verifyMasterPassword(userModel);
           if (!canDecrypt) return null;
         } else if (masterPasswordAsked.value == false) {
+          bool canDecrypt = await verifyMasterPassword(userModel);
+          if (!canDecrypt) return null;
+        } else if (useLocalAuth.value) {
           bool canDecrypt = await verifyMasterPassword(userModel);
           if (!canDecrypt) return null;
         }
@@ -493,6 +497,18 @@ class NotesController extends GetxController {
 
   Future<void> setLocalAuth(bool value) async {
     await _authController.setLocalAuth(value);
+  }
+
+  Future<void> verifyMasterPasswordStatus() async {
+    bool status = await _authController.verifyMasterPasswordStatus();
+    if (!status) {
+      alwaysRequireMasterPassword.value = status;
+      masterPasswordAsked.value = !status;
+    }
+  }
+
+  Future<void> changeMasterPasswordStatus(bool value) async {
+    _authController.changeMasterPasswordStatus(value);
   }
 
   @override
