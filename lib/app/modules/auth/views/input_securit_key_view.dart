@@ -13,6 +13,7 @@ class InputSecurityKeyView extends GetView<SignUpController>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ColorHelper.primaryDarkColor,
       body: Padding(
         padding: const EdgeInsets.all(15.0),
         child: Form(
@@ -48,7 +49,7 @@ class InputSecurityKeyView extends GetView<SignUpController>
                       style: TextStyle(
                         fontWeight: FontWeight.w400,
                         fontSize: 15,
-                        color: ColorHelper.grey,
+                        color: ColorHelper.blackColor,
                       ),
                     ),
                     TextButton(
@@ -62,8 +63,8 @@ class InputSecurityKeyView extends GetView<SignUpController>
                         child: const Text(
                           "Login",
                           style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
                             color: ColorHelper.blackColor,
                           ),
                         )),
@@ -89,9 +90,9 @@ class InputSecurityKeyView extends GetView<SignUpController>
         const Text(
           "Input 8 digit security key which will be used to secure notes data. Please write carefully because this key won't change once set.",
           style: TextStyle(
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w400,
               fontSize: 15,
-              color: ColorHelper.grey),
+              color: ColorHelper.blackColor),
         ),
         15.spaceY,
         Obx(() => Column(
@@ -104,6 +105,7 @@ class InputSecurityKeyView extends GetView<SignUpController>
                     hintText: "8 digit key",
                     labelText: "Security Key",
                     labelSameAsHint: false,
+                    fillColor: ColorHelper.primaryColor,
                     prefixIcon: Icons.lock_outline,
                     obscureText: false,
                     // Set obscureText to true for password field
@@ -133,12 +135,13 @@ class InputSecurityKeyView extends GetView<SignUpController>
         const Text(
           "Provider 4 digit password which will be required to access secure documents. You can turn this off from Security & Password section.",
           style: TextStyle(
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w400,
               fontSize: 15,
-              color: ColorHelper.grey),
+              color: ColorHelper.blackColor),
         ),
         15.spaceY,
         MyTextField(
+          fillColor: ColorHelper.primaryColor,
           controller: controller.masterPasswordFieldController,
           validator: validateMasterPassword,
           keyboardType: TextInputType.number,
@@ -168,9 +171,9 @@ class InputSecurityKeyView extends GetView<SignUpController>
         const Text(
           "Provide your answer for recovery of master password. This question will be asked when you will try to recover master password",
           style: TextStyle(
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w400,
               fontSize: 15,
-              color: ColorHelper.grey),
+              color: ColorHelper.blackColor),
         ),
         15.spaceY,
         const Text("Select question: "),
@@ -186,6 +189,8 @@ class InputSecurityKeyView extends GetView<SignUpController>
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Radio<int>(
+                        fillColor: MaterialStateProperty.all<Color>(ColorHelper.primaryColor),
+                        focusColor: ColorHelper.primaryDarkColor,
                         value: i,
                         groupValue: controller.selectedRecoveryQuestion.value,
                         onChanged: (value) {
@@ -230,7 +235,7 @@ class InputSecurityKeyView extends GetView<SignUpController>
           controller: controller.recoveryQuestionAnswerFieldController,
           validator: validateSecurityQuestionAnswer,
           hintText: "Answer",
-          prefixIcon: Icons.person,
+          prefixIcon: Icons.person,fillColor: ColorHelper.primaryColor,
         ),
       ],
     );

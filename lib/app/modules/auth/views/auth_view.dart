@@ -12,8 +12,10 @@ class AuthView extends GetView<AuthController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ColorHelper.primaryDarkColor,
       appBar: AppBar(
-        title: const Text('AuthView'),
+      backgroundColor: ColorHelper.primaryDarkColor,
+        title: const Text('Login'),
         centerTitle: true,
       ),
       body:Login()

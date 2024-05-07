@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:notes_final_version/app/utils/utils.dart';
 
 class MyDialogs {
   static showLoadingDialog({String? message}) {
@@ -15,19 +16,13 @@ class MyDialogs {
       content: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const SizedBox(
-            height: 50.0,
-            width: 50.0,
-            child: CustomActivityIndicator(
-              color: Colors.grey,
-            ),
-          ),
-          const SizedBox(height: 10.0),
+         CircularProgressIndicator(color: ColorHelper.blackColor,),
+          20.spaceY,
           Text(
             message ?? 'Loading',
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.grey.shade700,
+              color: Colors.black,
               fontSize: 13.0,
               fontWeight: FontWeight.bold,
               decoration: TextDecoration.none,
@@ -47,7 +42,7 @@ class MyDialogs {
     // );
     Get.defaultDialog(
       title: title,
-
+titleStyle: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),
       onConfirm: onConfirm ??
           () {
             Get.back();

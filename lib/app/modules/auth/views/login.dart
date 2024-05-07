@@ -33,7 +33,7 @@ class Login extends StatelessWidget with CustomValidators {
                 style: TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 15,
-                    color: ColorHelper.grey),
+                    color: ColorHelper.blackColor),
               ),
               30.spaceY,
               MyTextField(
@@ -83,29 +83,29 @@ class Login extends StatelessWidget with CustomValidators {
                 },
               ),
               20.spaceY,
-              Align(
-                alignment: Alignment.bottomRight,
-                child: TextButton(
-                    onPressed: () {},
-                    child: const Text(
-                      "Forget Password?",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 15,
-                        color: ColorHelper.blackColor,
-                      ),
-                    )),
-              ),
+              // Align(
+              //   alignment: Alignment.bottomRight,
+              //   child: TextButton(
+              //       onPressed: () {},
+              //       child: const Text(
+              //         "Forget Password?",
+              //         style: TextStyle(
+              //           fontWeight: FontWeight.w500,
+              //           fontSize: 15,
+              //           color: ColorHelper.blackColor,
+              //         ),
+              //       )),
+              // ),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
+                   Text(
                     "Don't have an account?",
                     style: TextStyle(
                       fontWeight: FontWeight.w400,
                       fontSize: 15,
-                      color: ColorHelper.grey,
+                      color: ColorHelper.blackColor,
                     ),
                   ),
                   TextButton(
@@ -117,8 +117,8 @@ class Login extends StatelessWidget with CustomValidators {
                       child: const Text(
                         "Register",
                         style: TextStyle(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
                           color: ColorHelper.blackColor,
                         ),
                       )),
