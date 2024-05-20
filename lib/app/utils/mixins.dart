@@ -2,13 +2,13 @@ mixin CustomValidators {
   String? validateEmail(value) {
     if (value == null || value.isEmpty) {
       return "Email is required";
-    } else if (!_isValidEmail(value)) {
+    } else if (!isValidEmail(value)) {
       return "Invalid email format ( _@_.__ )";
     }
     return null;
   }
 
-  bool _isValidEmail(String email) {
+  bool isValidEmail(String email) {
     return RegExp(
             r'^[a-zA-Z0-9.!#$%&*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)+[a-zA-Z]{1,7}$')
         .hasMatch(email);

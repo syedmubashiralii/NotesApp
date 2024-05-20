@@ -64,6 +64,27 @@ class Login extends StatelessWidget with CustomValidators {
                           : [],
                     ],
                   )),
+                Align(
+                alignment: Alignment.bottomRight,
+                child: TextButton(
+                  
+                    onPressed: () {
+                      String? value=controller.emailFieldController.text;
+                      if (value == null || value.isEmpty || !isValidEmail(value)) {
+                        DefaultSnackbar.show("Failure", "Please enter valid email");
+                        return;
+                      } 
+                      controller.resetPassword();
+                    },
+                    child: const Text(
+                      "Forget Password?",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 15,
+                        color: ColorHelper.blackColor,
+                      ),
+                    )),
+              ),  
 
               30.spaceY,
               // isLoading
@@ -73,34 +94,23 @@ class Login extends StatelessWidget with CustomValidators {
                 text: "Log In",
                 onPress: () {
                   if (controller.loginFormKey.currentState!.validate()) {
+                    controller.userSigninOnServer();
                     // checkAndInsertUser(emailController.text.trim(),
                     //     passwordController.text.trim());
-                    DefaultSnackbar.show(
-                        "Error", "User not exist. Try registering yourself.");
+                    // DefaultSnackbar.show(
+                    //     "Error", "User not exist. Try registering yourself.");
                   } else {
                     logSuccess("Form not valid");
                   }
                 },
               ),
               20.spaceY,
-              // Align(
-              //   alignment: Alignment.bottomRight,
-              //   child: TextButton(
-              //       onPressed: () {},
-              //       child: const Text(
-              //         "Forget Password?",
-              //         style: TextStyle(
-              //           fontWeight: FontWeight.w500,
-              //           fontSize: 15,
-              //           color: ColorHelper.blackColor,
-              //         ),
-              //       )),
-              // ),
+              
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                   Text(
+                  const Text(
                     "Don't have an account?",
                     style: TextStyle(
                       fontWeight: FontWeight.w400,

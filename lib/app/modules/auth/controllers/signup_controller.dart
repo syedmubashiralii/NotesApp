@@ -1,9 +1,14 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart' as d;
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:notes_final_version/app/modules/auth/controllers/auth_controller.dart';
 import 'package:notes_final_version/app/modules/auth/models/user_model.dart';
 import 'package:notes_final_version/app/modules/auth/views/input_securit_key_view.dart';
 import 'package:notes_final_version/app/utils/utils.dart';
+import 'package:notes_final_version/app/utils/widgets/email_verification_sheet.dart';
 
 import '../services/client/client.dart';
 
@@ -19,6 +24,7 @@ abstract class PasswordCheckController {
 class SignUpController extends GetxController
     implements PasswordCheckController {
   AuthController authController = Get.find<AuthController>();
+  RxBool isEmailVerified=false.obs;
 
   // Signup screen instances
   final GlobalKey<FormState> signupFormKey = GlobalKey<FormState>();
@@ -112,38 +118,126 @@ class SignUpController extends GetxController
     ApiService().createNewUser(userModel);
   }
 
-  saveUserLocally() async {
+  userSignUpOnServer() async {
+    var headers = {'Accept': 'application/json', 'X-API-Key': 'KhurramShahzad'};
+    var data = d.FormData.fromMap({
+      'username': usernameFieldController.text,
+      'email': emailFieldController.text,
+      'password': passwordFieldController.text,
+      'passwordHint': passwordHintFieldController.text,
+      'encryptionKey': securityKeyFieldController.text,
+      'masterPassword': masterPasswordFieldController.text,
+      'passwordRecoveryQuestion':
+          recoveryQuestionsList[selectedRecoveryQuestion.value],
+      'passwordRecoveryQuestionAnswer':
+          recoveryQuestionAnswerFieldController.text
+    });
+
+    var dio = d.Dio();
+    var response = await dio.request(
+      '${AppConstants.BASE_URL}/api/signup',
+      options: d.Options(
+        method: 'POST',
+        headers: headers,
+      ),
+      data: data,
+    );
+    print(response.data);
+    if (response.statusCode == 200) {
+      if (response.data['status'] == false) {
+        MyDialogs.closeDialog();
+        MyDialogs.showMessageDialog(
+            title: "Failure",
+            description: response.data['message'],
+            onConfirm: () {
+              logInfo("Confirm tapped");
+              Get.back();
+            });
+        return false;
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  
+
+  Future<bool> verifyEmail() async {
+    MyDialogs.showLoadingDialog();
+    var headers = {'Accept': 'application/json', 'X-API-Key': 'KhurramShahzad'};
+    var data = d.FormData.fromMap({
+      'email': emailFieldController.text,
+    });
+
+    var dio = d.Dio();
+    var response = await dio.request(
+      '${AppConstants.BASE_URL}/api/verify_email',
+      options: d.Options(
+        method: 'POST',
+        headers: headers,
+      ),
+      data: data,
+    );
+    Get.back();
+    print(response.data);
+    if(response.statusCode==200){
+      if(response.data["status"]==true){
+        String? code = await EmailVerificationSheet(
+              title: "Email Verification",
+              subtitle:
+                  "Please enter the OTP sent to your email ${emailFieldController.text}.",
+              phoneNumber: "",
+              digits: 6)
+          .show();
+        if (code != null&&int.parse(code)==response.data["data"]["verification_code"]) {
+          return true;
+        }
+        return false;
+
+      }
+      return false;
+    }
+    return false;
+  }
+
+  
+
+  createUser() async {
     try {
       logInfo();
 
       MyDialogs.showLoadingDialog(message: "Creating your account...");
-      await authController.saveUserLocally(
-          username: usernameFieldController.text.trim(),
-          email: emailFieldController.text.trim(),
-          password: passwordFieldController.text.trim(),
-          passwordHint: passwordHintFieldController.text.trim(),
-          encryptionKey: securityKeyFieldController.text.trim(),
-          masterPassword: masterPasswordFieldController.text.trim(),
-          passwordRecoveryQuestion:
-              recoveryQuestionsList[selectedRecoveryQuestion.value],
-          passwordRecoveryQuestionAnswer:
-              recoveryQuestionAnswerFieldController.text.trim());
-      logSuccess("User created successfully");
-      await Future.delayed(const Duration(seconds: 2));
-      MyDialogs.closeDialog();
-      await Future.delayed(const Duration(milliseconds: 200));
 
-      MyDialogs.showMessageDialog(
-          title: "Success",
-          description:
-              "Your account is registered, and security password is set. Now you can secure your notes.",
-          onConfirm: () {
-            logInfo("Confirm tapped");
-            Get.back();
-            Get.back();
-            Get.back();
-            Get.back();
-          });
+      if (await userSignUpOnServer() == true) {
+        await authController.saveUserLocally(
+            username: usernameFieldController.text.trim(),
+            email: emailFieldController.text.trim(),
+            password: passwordFieldController.text.trim(),
+            passwordHint: passwordHintFieldController.text.trim(),
+            encryptionKey: securityKeyFieldController.text.trim(),
+            masterPassword: masterPasswordFieldController.text.trim(),
+            passwordRecoveryQuestion:
+                recoveryQuestionsList[selectedRecoveryQuestion.value],
+            passwordRecoveryQuestionAnswer:
+                recoveryQuestionAnswerFieldController.text.trim());
+        logSuccess("User created successfully");
+        MyDialogs.closeDialog();
+        await Future.delayed(const Duration(milliseconds: 200));
+
+        MyDialogs.showMessageDialog(
+            title: "Success",
+            description:
+                "Your account is registered, and security password is set. Now you can secure your notes.",
+            onConfirm: () {
+              logInfo("Confirm tapped");
+              Get.back();
+              Get.back();
+              Get.back();
+              Get.back();
+            });
+      } else {}
+
       // DefaultSnackbar.show("Success", "Account created successfully.");
     } catch (e) {
       logError("Error: $e");
@@ -155,20 +249,5 @@ class SignUpController extends GetxController
 
   moveToSecurityKeyScreen() {
     Get.to(() => const InputSecurityKeyView());
-  }
-
-  @override
-  void onInit() {
-    super.onInit();
-  }
-
-  @override
-  void onReady() {
-    super.onReady();
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
   }
 }

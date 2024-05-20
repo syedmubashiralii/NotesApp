@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:notes_final_version/app/utils/color_helper.dart';
 
 class AppConstants {
+  static const String BASE_URL = "https://grandmarecipes.click/KpNotes/public";
   static double kDefaultSpace = 8.0;
   static double kInputBorderRadius = 8;
   static double kScreenPadding = 6.0;

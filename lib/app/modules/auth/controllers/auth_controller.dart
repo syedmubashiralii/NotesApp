@@ -1,10 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:dio/dio.dart' as d;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:get/get.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:notes_final_version/app/modules/auth/models/Login_user_model.dart';
 import 'package:notes_final_version/app/utils/utils.dart';
 
 import '../models/user_model.dart';
@@ -15,6 +19,8 @@ part '../providers/secure_storage_provider.dart';
 class AuthController extends GetxController implements PasswordCheckController {
   final _SecureStorageProvider _storageProvider = _SecureStorageProvider();
   final GlobalKey<FormState> loginFormKey = GlobalKey<FormState>();
+
+  LoggedInUserModel? loggedInUser;
 
   final TextEditingController emailFieldController = TextEditingController();
   final TextEditingController passwordFieldController = TextEditingController();
@@ -39,7 +45,7 @@ class AuthController extends GetxController implements PasswordCheckController {
     isPasswordFocused.value = value;
   }
 
-  void passwordFieldOnChange(String value) {
+  void passwordFieldOnChange(String value) { 
     String password = value;
     passwordChecks[0] = password.length >= 8;
     passwordChecks[1] =
@@ -153,6 +159,68 @@ class AuthController extends GetxController implements PasswordCheckController {
     }
   }
 
+  userSigninOnServer() async {
+    MyDialogs.showLoadingDialog();
+    var headers = {'Accept': 'application/json', 'X-API-Key': 'KhurramShahzad'};
+    var data = d.FormData.fromMap({
+      'email': emailFieldController.text,
+      'password': passwordFieldController.text
+    });
+
+    var dio = d.Dio();
+    var response = await dio.request(
+      '${AppConstants.BASE_URL}/api/signin',
+      options: d.Options(
+        method: 'POST',
+        headers: headers,
+      ),
+      data: data,
+    );
+    Get.back();
+
+    if (response.statusCode == 200) {
+      print(json.encode(response.data));
+      if (response.data["status"] == true) {
+        loggedInUser =
+            LoggedInUserModel.fromJson(response.data["data"]["user"]);
+
+        print(loggedInUser!.email.toString());
+      }
+      else{
+        DefaultSnackbar.show("Error", response.data["message"]);
+      }
+    } else {
+      print(response.statusMessage);
+      DefaultSnackbar.show("Error", "Please check your credentials and try again");
+      }
+  }
+  Future<bool> resetPassword() async {
+    MyDialogs.showLoadingDialog();
+    var headers = {'Accept': 'application/json', 'X-API-Key': 'KhurramShahzad'};
+    var data = d.FormData.fromMap({
+      'email': emailFieldController.text,
+    });
+
+    var dio = d.Dio();
+    var response = await dio.request(
+      '${AppConstants.BASE_URL}/api/password_recovery',
+      options: d.Options(
+        method: 'POST',
+        headers: headers,
+      ),
+      data: data,
+    );
+    Get.back();
+    print(response.data);
+    if(response.statusCode==200&&response.data["status"]==true)
+    {
+      DefaultSnackbar.show("Success", response.data["message"]);
+      return true;
+    }
+    DefaultSnackbar.show("Failure", "Something went wrong, please check your email and try again");
+    return false;
+  }
+
   Future<bool> canUseLocalAuth() async {
     return await _storageProvider.canUseLocalAuth();
   }
@@ -164,19 +232,9 @@ class AuthController extends GetxController implements PasswordCheckController {
   // ************ Local auth ended ****************
 
   @override
-  void onInit() {
-    super.onInit();
-  }
-
-  @override
   void onReady() {
     super.onReady();
     passwordChecks.value = List.generate(lineList.length, (index) => false);
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
   }
 
   Future<bool> verifyMasterPasswordStatus() async {

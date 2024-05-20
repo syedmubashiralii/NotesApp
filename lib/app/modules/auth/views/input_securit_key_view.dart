@@ -34,7 +34,7 @@ class InputSecurityKeyView extends GetView<SignUpController>
                   text: "Submit",
                   onPress: () {
                     if (controller.securityFormKey.currentState!.validate()) {
-                      controller.saveUserLocally();
+                      controller.createUser();
                       // controller.moveToSecurityKeyScreen();
                     } else {
                       logSuccess("Form not valid");

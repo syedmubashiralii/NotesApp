@@ -12,6 +12,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   permission_handler_windows
   printing
   share_plus
+  smart_auth
   super_native_extensions
   url_launcher_windows
 )
