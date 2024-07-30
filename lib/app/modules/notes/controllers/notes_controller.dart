@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart' as d;
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as editor;
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
@@ -22,6 +25,7 @@ class NotesController extends GetxController {
   RxList<NoteModel?> searchedNotesList = <NoteModel>[].obs;
   RxList<NoteModel?> archivedNotesList = <NoteModel>[].obs;
   RxList<NoteModel?> pinnedNotesList = <NoteModel>[].obs;
+  RxList<NoteModel?> backedUpNotesList = <NoteModel>[].obs;
 
   RxList<String> labels = <String>[].obs;
   final box = GetStorage();
@@ -62,7 +66,7 @@ class NotesController extends GetxController {
   }
 
   void addUpdateNote(NoteModel newNote,
-      {String? folderName, String? labelName}) async {
+      {String? folderName, String? labelName,bool? fromRestore}) async {
     bool found = false;
     int index = 0;
 
@@ -81,9 +85,15 @@ class NotesController extends GetxController {
     }
     if (found == false) {
       await addNote(newNote, folderName: folderName, labelName: labelName);
+      if(fromRestore!=null){
+        DefaultSnackbar.show("Success", "Note Restored Successfully");
+      }
     } else {
       await updateNote(index, newNote,
           folderName: folderName, labelName: labelName);
+           if(fromRestore!=null){
+              DefaultSnackbar.show("Success", "Note already available locally"); 
+           }   
     }
   }
 
@@ -275,6 +285,191 @@ class NotesController extends GetxController {
       await HelperFunction.giveDelay();
       MyDialogs.closeDialog();
       rethrow;
+    }
+  }
+
+
+   Future<UserModel?> verifyUserLoggedIn1() async {
+    try {
+
+      //  Check user session
+      UserModel? userModel = await _authController.checkUserExist();
+      
+
+      return userModel;
+    } catch (e) {
+      logError("verifyUserLoggedIn error: $e");
+      rethrow;
+    }
+  }
+
+  Future<bool> restoreNotes() async {
+    try {
+      print("enter");
+      UserModel? userModel = await verifyUserLoggedIn1();
+      print("enter1");
+      if (userModel != null) {
+        print("enter2");
+       return await getAllBackedUpNotes();
+      } else {
+        await authenticateUser();
+        return false;
+      }
+    } catch (e) {
+      logError("Error in verifyAuthBeforeEncryption: $e");
+      MyDialogs.closeDialog();
+
+      await HelperFunction.giveDelay();
+      MyDialogs.showMessageDialog(
+          title: "Error",
+          description: "There is some error, please try again later.");
+
+          return false;
+    }
+  }
+  //send note to server for additon or updation
+  backupNote(NoteModel note,{String? folderName}) async {
+    try {
+      print("enter");
+      UserModel? userModel = await verifyUserLoggedIn1();
+      print("enter1");
+      if (userModel != null) {
+        print("enter2");
+        backupSingleNote(note,folderName:folderName);
+        print("enter3");
+      } else {
+        await authenticateUser();
+      }
+    } catch (e) {
+      logError("Error in verifyAuthBeforeEncryption: $e");
+      MyDialogs.closeDialog();
+
+      await HelperFunction.giveDelay();
+      MyDialogs.showMessageDialog(
+          title: "Error",
+          description: "There is some error, please try again later.");
+    }
+  }
+  ///get all notes from server against loggedin user
+  Future<bool> getAllBackedUpNotes() async {
+    MyDialogs.showLoadingDialog(message: "Fetching Notes");
+    backedUpNotesList.clear();
+    print("enter getAllBackedUpNotes");
+    print(_authController.loggedInUser!.authToken);
+    var headers = {
+      'Accept': 'application/json',
+      'X_API_KEY': 'KhurramShahzad',
+      'Authorization': 'Bearer ${_authController.loggedInUser!.authToken ?? ""}'
+    };
+    var dio = d.Dio();
+    var response = await dio.request(
+      '${AppConstants.BASE_URL}/api/user-notes',
+      options: d.Options(
+        method: 'GET',
+        headers: headers,
+      ),
+    );
+    MyDialogs.closeDialog();
+    print(json.encode(response.data));
+    if (response.statusCode == 200) {
+      print(json.encode(response.data));
+      if(response.data["status"]==true){
+        for(var data in response.data["data"]['notes']){
+          backedUpNotesList.add(NoteModel.fromJson(data));
+        }
+        return true;
+      }  print(backedUpNotesList.length.toString());
+      return false;
+    
+      
+    } else {
+      print(response.statusMessage);
+      return false;
+    }
+  }
+
+   Future deleteNoteFromCloud(NoteModel note) async {
+    MyDialogs.showLoadingDialog(message: "Deleting note from cloud...");
+    var headers = {
+      'Accept': 'application/json',
+      'X_API_KEY': 'KhurramShahzad',
+      'Authorization': 'Bearer ${_authController.loggedInUser!.authToken ?? ""}'
+    };
+   
+
+    var dio = d.Dio();
+    var response = await dio.request(
+      '${AppConstants.BASE_URL}/api/delete-notes/${note.id}',
+      options: d.Options(
+        method: 'DELETE',
+        headers: headers,
+      ),
+    );
+    MyDialogs.closeDialog();
+    if (response.statusCode == 200||response.statusCode==201) {
+      if(response.data["status"]==true){
+        note.id=null;
+        note.user_id=null;
+        addUpdateNote(note);
+        getAllBackedUpNotes();
+      }
+      print(json.encode(response.data));
+    } else {
+      print("here3");
+      print(response.statusMessage);
+    }
+  }
+
+  Future backupSingleNote(NoteModel note,{String? folderName}) async {
+    MyDialogs.showLoadingDialog(message: "Loading...");
+    print("authtoken${_authController.loggedInUser!.authToken}??''");
+    var headers = {
+      'Accept': 'application/json',
+      'X_API_KEY': 'KhurramShahzad',
+      'Authorization': 'Bearer ${_authController.loggedInUser!.authToken ?? ""}'
+    };
+    print("label of notes");
+    print(note.labels.toString());
+    var data = d.FormData.fromMap({
+      'labels': jsonEncode(note.labels),
+      'document': note.document,
+      // 'labels':note.labels.toString(),
+      'title': note.title,
+      'folder': note.folder,
+      'date': note.date.toString(),
+      'uid': note.uid,
+      'is_archived': note.isArchived==true?'1':'0',
+      'is_pinned': note.isPinned==true?'1':'0',
+      'searchable_document': note.document,
+      'encrypted': note.encrypted==true?'1':'0',
+      'edited': note.edited==true?'1':'0',
+      'id': note.id?.toString()
+    });
+
+    var dio = d.Dio();
+    var response = await dio.request(
+      '${AppConstants.BASE_URL}/api/add_or_update_note',
+      options: d.Options(
+        method: 'POST',
+        headers: headers,
+      ),
+      data: data,
+    );
+    MyDialogs.closeDialog();
+    print(json.encode(response.data));
+    print("here ${response.statusCode}");
+    if (response.statusCode == 200||response.statusCode==201) {
+      if(response.data["status"]==true){
+        print("here2");
+        DefaultSnackbar.show("Success", response.data["message"]);
+        note.id=int.parse(response.data["data"]["notes"]["id"].toString());
+        note.user_id=int.parse(response.data["data"]["notes"]["user_id"].toString());
+        addUpdateNote(note,folderName: folderName);
+      }
+      print(json.encode(response.data));
+    } else {
+      print("here3");
+      print(response.statusMessage);
     }
   }
 

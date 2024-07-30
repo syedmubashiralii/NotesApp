@@ -15,7 +15,7 @@ import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:jiffy/jiffy.dart';
+import 'package:intl/intl.dart';
 import 'package:notes_final_version/app/modules/notes/controllers/notes_controller.dart';
 import 'package:notes_final_version/app/modules/notes/models/notes_model.dart';
 import 'package:notes_final_version/app/modules/notes/views/create_note.dart';
@@ -139,10 +139,8 @@ class ArchivedNotes extends StatelessWidget {
                             Row(
                               children: [
                                 Text(
-                                    Jiffy(DateTime.parse(
-                                            noteData.date.toString()))
-                                        .MMMd
-                                        .toString(),
+                                  DateFormat('MMM d').format(noteData.date),
+                                   
                                     style: GoogleFonts.roboto(
                                         fontSize: 12,
                                         color: ColorHelper.blackColor)),
@@ -294,7 +292,7 @@ class ArchivedNotes extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: 10),
         autoFocus: true,
         enableInteractiveSelection: false,
-        readOnly: true,
+        // readOnly: true,
         showCursor: false,
         scrollPhysics: const NeverScrollableScrollPhysics(),
         scrollable: true,

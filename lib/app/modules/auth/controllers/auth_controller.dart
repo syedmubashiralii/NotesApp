@@ -45,7 +45,7 @@ class AuthController extends GetxController implements PasswordCheckController {
     isPasswordFocused.value = value;
   }
 
-  void passwordFieldOnChange(String value) { 
+  void passwordFieldOnChange(String value) {
     String password = value;
     passwordChecks[0] = password.length >= 8;
     passwordChecks[1] =
@@ -59,14 +59,16 @@ class AuthController extends GetxController implements PasswordCheckController {
   }
 
   Future<void> saveUserLocally(
-      {required String username,
+      {
+      required var id,  
+      required String username,
       required String email,
       required String password,
       required String passwordHint,
       required String encryptionKey,
       required String masterPassword,
       required String passwordRecoveryQuestion,
-      required String passwordRecoveryQuestionAnswer}) async {
+      required String passwordRecoveryQuestionAnswer,required String authToken}) async {
     try {
       await _storageProvider.writeSecureData(MapKey.userName, username);
       await _storageProvider.writeSecureData(MapKey.userEmail, email);
@@ -82,6 +84,9 @@ class AuthController extends GetxController implements PasswordCheckController {
       await _storageProvider.writeSecureData(
           MapKey.userPasswordRecoveryQuestionAnswer,
           passwordRecoveryQuestionAnswer);
+           await _storageProvider.writeSecureData(
+      await  MapKey.userAuthToken,
+          authToken);
     } catch (e) {
       rethrow;
     }
@@ -90,7 +95,9 @@ class AuthController extends GetxController implements PasswordCheckController {
   Future<UserModel?> checkUserExist() async {
     try {
       UserModel? userModel = await _storageProvider.readAllValues();
+  //  print("UserModel auth token${userModel!.authToken??""}");
       if (userModel != null) {
+        loggedInUser=LoggedInUserModel(id: userModel.id??-1, username: userModel.username??"", email: userModel.email??"", passwordHint: userModel.passwordHint??"", encryptionKey: userModel.encryptionKey??"", masterPassword: userModel.masterPassword??"", passwordRecoveryQuestion: userModel.recoveryQuestion??"", passwordRecoveryQuestionAnswer: userModel.recoveryQuestionAnswer??"", authToken: userModel.authToken??"");
         return userModel;
       } else {
         return null;
@@ -146,7 +153,6 @@ class AuthController extends GetxController implements PasswordCheckController {
           options: const AuthenticationOptions(
               // biometricOnly: true,
               ));
-
       if (didAuthenticate) {
         logSuccess("Successfully authenticated");
         return true;
@@ -183,7 +189,21 @@ class AuthController extends GetxController implements PasswordCheckController {
       if (response.data["status"] == true) {
         loggedInUser =
             LoggedInUserModel.fromJson(response.data["data"]["user"]);
-
+         await saveUserLocally(
+          id: loggedInUser!.id??-1,
+            username: loggedInUser!.username??"",
+            email: loggedInUser!.email??"",
+            password: "",
+            passwordHint: loggedInUser!.passwordHint??"",
+            encryptionKey: loggedInUser!.encryptionKey??"",
+            masterPassword: loggedInUser!.masterPassword??"",
+            passwordRecoveryQuestion:
+                loggedInUser!.passwordRecoveryQuestion??"",
+            passwordRecoveryQuestionAnswer:
+                loggedInUser!.passwordRecoveryQuestionAnswer??"",
+                authToken: loggedInUser!.authToken??"");
+                Get.back();
+          DefaultSnackbar.show("Success", "Login Successfull!");      
         print(loggedInUser!.email.toString());
       }
       else{

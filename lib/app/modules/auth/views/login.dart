@@ -67,13 +67,12 @@ class Login extends StatelessWidget with CustomValidators {
                 Align(
                 alignment: Alignment.bottomRight,
                 child: TextButton(
-                  
                     onPressed: () {
                       String? value=controller.emailFieldController.text;
                       if (value == null || value.isEmpty || !isValidEmail(value)) {
                         DefaultSnackbar.show("Failure", "Please enter valid email");
                         return;
-                      } 
+                      }
                       controller.resetPassword();
                     },
                     child: const Text(
@@ -121,7 +120,6 @@ class Login extends StatelessWidget with CustomValidators {
                   TextButton(
                       onPressed: () {
                         Get.put(SignUpController());
-
                         Get.to(() => const SignUpView());
                       },
                       child: const Text(
@@ -130,8 +128,8 @@ class Login extends StatelessWidget with CustomValidators {
                           fontWeight: FontWeight.w600,
                           fontSize: 16,
                           color: ColorHelper.blackColor,
-                        ),
-                      )),
+                        )
+                  )),
                 ],
               )
             ],

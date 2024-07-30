@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:notes_final_version/app/modules/auth/controllers/auth_controller.dart';
+import 'package:notes_final_version/app/modules/auth/models/Login_user_model.dart';
 import 'package:notes_final_version/app/modules/auth/models/user_model.dart';
 import 'package:notes_final_version/app/modules/auth/views/input_securit_key_view.dart';
 import 'package:notes_final_version/app/utils/utils.dart';
@@ -24,7 +25,7 @@ abstract class PasswordCheckController {
 class SignUpController extends GetxController
     implements PasswordCheckController {
   AuthController authController = Get.find<AuthController>();
-  RxBool isEmailVerified=false.obs;
+  RxBool isEmailVerified = false.obs;
 
   // Signup screen instances
   final GlobalKey<FormState> signupFormKey = GlobalKey<FormState>();
@@ -103,20 +104,20 @@ class SignUpController extends GetxController
 
   // ************* Security Key validation ended ***************
 
-  createNewUser() {
-    UserModel userModel = UserModel(
-      username: usernameFieldController.text.trim(),
-      email: emailFieldController.text.trim(),
-      password: passwordFieldController.text.trim(),
-      passwordHint: passwordHintFieldController.text.trim(),
-      encryptionKey: securityKeyFieldController.text.trim(),
-      masterPassword: masterPasswordFieldController.text.trim(),
-      recoveryQuestion: recoveryQuestionsList[selectedRecoveryQuestion.value],
-      recoveryQuestionAnswer: recoveryQuestionAnswerFieldController.text.trim(),
-    );
+  // createNewUser() {
+  //   UserModel userModel = UserModel(
+  //     username: usernameFieldController.text.trim(),
+  //     email: emailFieldController.text.trim(),
+  //     password: passwordFieldController.text.trim(),
+  //     passwordHint: passwordHintFieldController.text.trim(),
+  //     encryptionKey: securityKeyFieldController.text.trim(),
+  //     masterPassword: masterPasswordFieldController.text.trim(),
+  //     recoveryQuestion: recoveryQuestionsList[selectedRecoveryQuestion.value],
+  //     recoveryQuestionAnswer: recoveryQuestionAnswerFieldController.text.trim(),
+  //   );
 
-    ApiService().createNewUser(userModel);
-  }
+  //   ApiService().createNewUser(userModel);
+  // }
 
   userSignUpOnServer() async {
     var headers = {'Accept': 'application/json', 'X-API-Key': 'KhurramShahzad'};
@@ -144,6 +145,24 @@ class SignUpController extends GetxController
     );
     print(response.data);
     if (response.statusCode == 200) {
+      if (response.data["status"] == true) {
+        authController.loggedInUser =
+            LoggedInUserModel.fromJson(response.data["data"]["user"]);
+        await authController.saveUserLocally(
+            id: authController.loggedInUser!.id,
+            username: usernameFieldController.text.trim(),
+            email: emailFieldController.text.trim(),
+            password: passwordFieldController.text.trim(),
+            passwordHint: passwordHintFieldController.text.trim(),
+            encryptionKey: securityKeyFieldController.text.trim(),
+            masterPassword: masterPasswordFieldController.text.trim(),
+            passwordRecoveryQuestion:
+                recoveryQuestionsList[selectedRecoveryQuestion.value],
+            passwordRecoveryQuestionAnswer:
+                recoveryQuestionAnswerFieldController.text.trim(),
+            authToken: authController.loggedInUser!.authToken ?? "");
+        print(authController.loggedInUser!.email.toString());
+      }
       if (response.data['status'] == false) {
         MyDialogs.closeDialog();
         MyDialogs.showMessageDialog(
@@ -160,8 +179,6 @@ class SignUpController extends GetxController
       return false;
     }
   }
-
-  
 
   Future<bool> verifyEmail() async {
     MyDialogs.showLoadingDialog();
@@ -181,27 +198,25 @@ class SignUpController extends GetxController
     );
     Get.back();
     print(response.data);
-    if(response.statusCode==200){
-      if(response.data["status"]==true){
+    if (response.statusCode == 200) {
+      if (response.data["status"] == true) {
         String? code = await EmailVerificationSheet(
-              title: "Email Verification",
-              subtitle:
-                  "Please enter the OTP sent to your email ${emailFieldController.text}.",
-              phoneNumber: "",
-              digits: 6)
-          .show();
-        if (code != null&&int.parse(code)==response.data["data"]["verification_code"]) {
+                title: "Email Verification",
+                subtitle:
+                    "Please enter the OTP sent to your email ${emailFieldController.text}.",
+                phoneNumber: "",
+                digits: 6)
+            .show();
+        if (code != null &&
+            int.parse(code) == response.data["data"]["verification_code"]) {
           return true;
         }
         return false;
-
       }
       return false;
     }
     return false;
   }
-
-  
 
   createUser() async {
     try {
@@ -210,17 +225,6 @@ class SignUpController extends GetxController
       MyDialogs.showLoadingDialog(message: "Creating your account...");
 
       if (await userSignUpOnServer() == true) {
-        await authController.saveUserLocally(
-            username: usernameFieldController.text.trim(),
-            email: emailFieldController.text.trim(),
-            password: passwordFieldController.text.trim(),
-            passwordHint: passwordHintFieldController.text.trim(),
-            encryptionKey: securityKeyFieldController.text.trim(),
-            masterPassword: masterPasswordFieldController.text.trim(),
-            passwordRecoveryQuestion:
-                recoveryQuestionsList[selectedRecoveryQuestion.value],
-            passwordRecoveryQuestionAnswer:
-                recoveryQuestionAnswerFieldController.text.trim());
         logSuccess("User created successfully");
         MyDialogs.closeDialog();
         await Future.delayed(const Duration(milliseconds: 200));

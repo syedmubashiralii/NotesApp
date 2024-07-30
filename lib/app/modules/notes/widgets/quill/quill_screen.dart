@@ -100,9 +100,9 @@ class _QuillScreenState extends State<QuillScreen> {
             menuChildren: [
               MenuItemButton(
                 onPressed: () {
-                  final html = _controller.document.toDelta().toHtml();
+                  final html = _controller.document.toDelta();
                   _controller.document =
-                      Document.fromDelta(Document.fromHtml(html));
+                      Document.fromDelta(html);
                 },
                 child: const Text('Load with HTML'),
               ),
@@ -175,7 +175,7 @@ class _QuillScreenState extends State<QuillScreen> {
                   configurations: QuillEditorConfigurations(
                     sharedConfigurations: _sharedConfigurations,
                     controller: _controller,
-                    readOnly: _isReadOnly,
+                    // readOnly: _isReadOnly,
                   ),
                   scrollController: _editorScrollController,
                   focusNode: _editorFocusNode,

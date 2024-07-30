@@ -22,11 +22,11 @@ class AppPages {
       page: () => HomeView(),
       binding: NotesBinding(),
     ),
-    GetPage(
-      name: _Paths.TODO,
-      page: () => const TodoView(),
-      binding: TodoBinding(),
-    ),
+    // GetPage(
+    //   name: _Paths.TODO,
+    //   page: () => const TodoView(),
+    //   binding: TodoBinding(),
+    // ),
     GetPage(
       name: _Paths.REMINDERS,
       page: () => const RemindersView(),

@@ -7,6 +7,7 @@ import 'package:notes_final_version/app/modules/notes/controllers/notes_controll
 import 'package:notes_final_version/app/modules/notes/models/labels_model.dart';
 import 'package:notes_final_version/app/modules/notes/models/notes_model.dart';
 import 'package:notes_final_version/app/modules/notes/views/archived_notes.dart';
+import 'package:notes_final_version/app/modules/notes/views/backedup_notes_list.dart';
 import 'package:notes_final_version/app/modules/notes/views/labels_view.dart';
 import 'package:notes_final_version/app/modules/notes/views/settings_view.dart';
 import 'package:notes_final_version/app/routes/app_pages.dart';
@@ -52,14 +53,14 @@ class DrawerScreen extends StatelessWidget {
                 onTap: () {
                   notesController.toggleDrawer();
                 }),
-            5.spaceY,
-            CustomNavTile(
-                title: 'Todos',
-                icon: FontAwesomeIcons.checkSquare,
-                selected: true, //_fragmentIndex == 0,
-                onTap: () {
-                  Get.toNamed(Routes.TODO);
-                }),
+            // 5.spaceY,
+            // CustomNavTile(
+            //     title: 'Todos',
+            //     icon: FontAwesomeIcons.checkSquare,
+            //     selected: true, //_fragmentIndex == 0,
+            //     onTap: () {
+            //       Get.toNamed(Routes.TODO);
+            //     }),
             5.spaceY,
             CustomNavTile(
                 title: 'Reminder',
@@ -103,6 +104,19 @@ class DrawerScreen extends StatelessWidget {
 
                   Get.to(LabelsView(),
                       transition: Transition.downToUp, curve: Curves.easeInOut);
+                }),
+            5.spaceY,
+            CustomNavTile(
+                title: 'Restore Notes',
+                icon: FontAwesomeIcons.windowRestore,
+                selected: true,
+                onTap: () async {
+                  bool response = await notesController.restoreNotes();
+                  if (response == true) {
+                    Get.to(() => BackedUpNotes(),
+                        transition: Transition.downToUp,
+                        curve: Curves.easeInOut);
+                  }
                 }),
             5.spaceY,
             Divider(

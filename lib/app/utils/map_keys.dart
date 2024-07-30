@@ -1,4 +1,5 @@
 class MapKey {
+  static const userId='id';
   static const userEmail = 'email';
   static const userPassword = 'password';
   static const userName = 'username';

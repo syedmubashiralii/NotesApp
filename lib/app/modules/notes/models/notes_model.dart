@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:hive/hive.dart';
 
 part 'notes_model.g.dart';
@@ -26,6 +28,10 @@ class NoteModel {
   bool encrypted;
   @HiveField(10)
   bool edited;
+  @HiveField(11)
+  int? id;
+  @HiveField(12)
+  int? user_id;
 
   NoteModel(
       {required this.document,
@@ -37,6 +43,8 @@ class NoteModel {
       required this.date,
       required this.uid,
       required this.labels,
+      this.user_id,
+      this.id,
       this.edited = false,
       this.encrypted = false});
 
@@ -53,20 +61,28 @@ class NoteModel {
       'labels': labels,
       'edited': edited,
       'encrypted': encrypted,
+      'user_id': user_id,
+      'id': id,
     };
   }
 
   factory NoteModel.fromJson(Map<String, dynamic> json) {
+     List<dynamic> dynamicList = jsonDecode(json['labels']);
+    List<String> stringList = dynamicList.cast<String>();
+    List<String> stringList1 = dynamicList.map((e) => e.toString()).toList();
     return NoteModel(
       document: json['document'],
-      searchableDocument: json['searchableDocument'],
+      searchableDocument: json['searchable_document'],
       title: json['title'],
-      isArchived: json['isArchived'],
-      isPinned: json['isPinned'],
+      isArchived: json['is_archived'],
+      isPinned: json['is_pinned'],
       folder: json['folder'],
       date: DateTime.parse(json['date']),
       uid: json['uid'],
-      labels: json['labels'],
+      labels: stringList,
+      // labels: json['labels'] != null ? List<String>.from(jsonDecode(json['labels'])) : [],
+      id: json['id'] == null ? null : json['id'],
+      user_id: json['user_id'] == null ? null : json['user_is'],
       edited: json.containsKey('edited') ? json['edited'] : false,
       encrypted: json.containsKey('encrypted') ? json['encrypted'] : false,
     );

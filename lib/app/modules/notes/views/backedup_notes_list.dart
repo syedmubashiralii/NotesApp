@@ -1,13 +1,8 @@
-import 'dart:convert';
-
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/extensions.dart';
-import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:flutter_quill_extensions/embeds/widgets/image.dart';
 import 'package:flutter_quill_extensions/flutter_quill_embeds.dart';
-import 'package:flutter_quill_extensions/models/config/image/editor/image_configurations.dart';
 import 'package:flutter_quill_extensions/models/config/shared_configurations.dart';
 import 'package:flutter_quill_extensions/utils/utils.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -17,47 +12,48 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:notes_final_version/app/modules/notes/controllers/folders_controller.dart';
+import 'package:notes_final_version/app/modules/notes/controllers/labels_controller.dart';
 import 'package:notes_final_version/app/modules/notes/controllers/notes_controller.dart';
+import 'package:notes_final_version/app/modules/notes/models/folders_model.dart';
+import 'package:notes_final_version/app/modules/notes/models/labels_model.dart';
 import 'package:notes_final_version/app/modules/notes/models/notes_model.dart';
-import 'package:notes_final_version/app/modules/notes/views/create_note.dart';
-import 'package:notes_final_version/app/modules/notes/widgets/home_search_widget.dart';
 import 'package:notes_final_version/app/modules/notes/widgets/quill/embeds/timestamp_embed.dart';
 import 'package:notes_final_version/app/utils/utils.dart';
+import 'dart:convert';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'package:flutter_quill_extensions/models/config/image/editor/image_configurations.dart';
+import 'package:uuid/uuid.dart';
 
-class NoteCards extends StatelessWidget {
-  String? folderName;
-  String? labelName;
-
-  NoteCards({super.key, this.folderName, this.labelName});
-
+class BackedUpNotes extends StatelessWidget {
+  BackedUpNotes({super.key});
   final NotesController notesController = Get.find();
+  final FoldersController foldersController = Get.find();
+  final LabelsController labelsController = Get.find();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorHelper.primaryDarkColor,
-      appBar: folderName == null && labelName == null
-          ? null
-          : AppBar(
-              leading: IconButton(
-                  icon: const Icon(
-                    Icons.close,
-                    size: 32,
-                  ),
-                  onPressed: () {
-                    Get.back();
-                  }),
-              centerTitle: true,
-              backgroundColor: Colors.transparent,
-              title: Text(folderName ?? labelName ?? "",
-                  style: GoogleFonts.poppins(
-                      fontSize: AppConstants.kAppbarFontSize)),
+      appBar: AppBar(
+        leading: IconButton(
+            icon: const Icon(
+              Icons.close,
+              size: 32,
             ),
+            onPressed: () {
+              Get.back();
+            }),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        title: Text("Backed Up Notes",
+            style: GoogleFonts.poppins(fontSize: AppConstants.kAppbarFontSize)),
+      ),
       body: Padding(
         padding: EdgeInsets.all(AppConstants.kScreenPadding),
         child: Obx(() {
-          return notesController.notesList.isEmpty &&
-                  notesController.searchedNotesList.isEmpty
+          return notesController.backedUpNotesList.isEmpty
               ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -69,7 +65,7 @@ class NoteCards extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'No record found',
+                        'No backed up notes found',
                         style: GoogleFonts.poppins(fontSize: 16),
                       ),
                     ],
@@ -77,30 +73,19 @@ class NoteCards extends StatelessWidget {
                 )
               : Column(
                   children: [
-                    HomeSearchWidget(),
                     15.spaceY,
                     Expanded(
                       child: MasonryGridView.builder(
                           physics: const BouncingScrollPhysics(),
                           mainAxisSpacing: 5,
                           crossAxisSpacing: 5,
-                          itemCount: notesController
-                                      .searchController.value.text.isNotEmpty ||
-                                  notesController.searchedNotesList.isNotEmpty
-                              ? notesController.searchedNotesList.length
-                              : notesController.notesList.length,
+                          itemCount: notesController.backedUpNotesList.length,
                           gridDelegate:
                               const SliverSimpleGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: 2),
                           itemBuilder: ((gridViewContext, index) {
-                            NoteModel? noteData = notesController
-                                        .searchController
-                                        .value
-                                        .text
-                                        .isNotEmpty ||
-                                    notesController.searchedNotesList.isNotEmpty
-                                ? notesController.searchedNotesList[index]
-                                : notesController.notesList[index];
+                            NoteModel? noteData =
+                                notesController.backedUpNotesList[index];
 
                             if (noteData == null) {
                               return const Text("Note is null");
@@ -114,111 +99,66 @@ class NoteCards extends StatelessWidget {
                                   color: ColorHelper.blackColor),
                               animateMenuItems: false,
                               blurBackgroundColor: ColorHelper.blackColor,
-                              onPressed: () {
-                                navigateToNoteEditScreen(noteData);
-                              },
+                              onPressed: () {},
                               menuItems: [
                                 FocusedMenuItem(
-                                    trailingIcon: const Icon(Icons.edit,
+                                    trailingIcon: const Icon(
+                                        Icons.cloud_download,
                                         color: ColorHelper.blackColor),
                                     title: const Text(
-                                      'Edit',
+                                      'Restore',
                                       style: TextStyle(
                                           color: ColorHelper.blackColor),
                                     ),
-                                    onPressed: () {
-                                      navigateToNoteEditScreen(noteData);
-                                    },
-                                    backgroundColor: ColorHelper.primaryColor),
-                                FocusedMenuItem(
-                                    trailingIcon: const Icon(Icons.archive,
-                                        color: ColorHelper.blackColor),
-                                    title: Text(
-                                      noteData.isArchived == false
-                                          ? 'Archive'
-                                          : 'Unarchive',
-                                      style: const TextStyle(
-                                          color: ColorHelper.blackColor),
-                                    ),
                                     onPressed: () async {
-                                      noteData.isArchived =
-                                          !noteData.isArchived;
-                                      notesController.addUpdateNote(noteData,
-                                          folderName: folderName);
-                                    },
-                                    backgroundColor: ColorHelper.primaryColor),
-                                FocusedMenuItem(
-                                    trailingIcon: const Icon(Icons.push_pin,
-                                        color: ColorHelper.blackColor),
-                                    title: Text(
-                                      noteData.isPinned == false
-                                          ? 'Pin'
-                                          : 'UnPin',
-                                      style: const TextStyle(
-                                          color: ColorHelper.blackColor),
-                                    ),
-                                    onPressed: () async {
-                                      noteData.isPinned = !noteData.isPinned;
-                                      notesController.addUpdateNote(noteData,
-                                          folderName: folderName);
-                                    },
-                                    backgroundColor: ColorHelper.primaryColor),
-                                FocusedMenuItem(
-                                    trailingIcon:  Icon(noteData.encrypted?Icons.no_encryption:Icons.enhanced_encryption,
-                                        color: ColorHelper.blackColor),
-                                    title: Text(
-                                      noteData.encrypted
-                                          ? 'Decrypt'
-                                          : 'Encrypt',
-                                      style: const TextStyle(
-                                          color: ColorHelper.blackColor),
-                                    ),
-                                    onPressed: () async {
-                                      // noteData.isPinned = !noteData.isPinned;
-                                      // notesController.addUpdateNote(noteData,
-                                      //     folderName: folderName);
-                                      if (noteData.encrypted) {
-                                        // permanently decrypt
+                                      bool folderExists = foldersController
+                                              .foldersList.isNotEmpty &&
+                                          foldersController.foldersList.value
+                                              .any((folder) =>
+                                                  folder!.name.trim() ==
+                                                  noteData.folder.trim());
 
-                                        notesController.performDecryption(
-                                            noteData: noteData,
-                                            folderName: folderName,
-                                            updateNoteInstance: true);
-                                      } else {
-                                        // permanently encrypt
-                                        notesController.performEncryption(
-                                            noteData,
-                                            folderName: folderName);
+                                      if (!folderExists) {
+                                        final String uid = const Uuid().v4();
+                                        foldersController.addFolder(FolderModel(
+                                            uid: uid,
+                                            name: noteData.folder,
+                                            date: DateTime.now()));
                                       }
-                                    },
-                                    backgroundColor: ColorHelper.primaryColor),
-                                     FocusedMenuItem(
-                                    trailingIcon: const Icon(
-                                        Icons.backup,
-                                        color: ColorHelper.blackColor),
-                                    title:  Text(noteData.id != null?"Update Note":
-                                      'BackUp Note',
-                                      style: TextStyle(
-                                          color: ColorHelper.blackColor),
-                                    ),
-                                    onPressed: () async {
-                                      notesController.backupNote(noteData,folderName: folderName);
+
+                                      for(var lbl in noteData.labels){
+                                        bool labelExists = labelsController
+                                              .labelsList.isNotEmpty &&
+                                          labelsController.labelsList.value
+                                              .any((label) =>
+                                                  label!.name.trim() ==
+                                                  lbl.toString().trim());
+
+                                      if (!labelExists) {
+                                        final String uid = const Uuid().v4();
+                                        labelsController.addLabel(LabelModel(
+                                            uid: uid,
+                                            name: lbl,
+                                            date: DateTime.now()));
+                                      }
+                                      }
+
+                                      notesController.addUpdateNote(noteData,
+                                          fromRestore: true);
                                     },
                                     backgroundColor: ColorHelper.primaryColor),
                                 FocusedMenuItem(
                                     trailingIcon: const Icon(
-                                        Icons.delete_forever_outlined,
+                                        Icons.delete_forever,
                                         color: ColorHelper.whiteColor),
                                     title: const Text(
-                                      'Delete',
+                                      'Delete from cloud',
                                       style: TextStyle(
                                           color: ColorHelper.whiteColor),
                                     ),
                                     onPressed: () async {
-                                      notesController.deleteNote(
-                                        noteData.uid,
-                                        folderName: folderName,
-                                      );
+                                      notesController
+                                          .deleteNoteFromCloud(noteData);
                                     },
                                     backgroundColor: ColorHelper.redAccentColor)
                               ],
@@ -268,7 +208,8 @@ class NoteCards extends StatelessWidget {
                                               ),
                                         Row(
                                           children: [
-                                            Text(DateFormat('MMM d').format(noteData.date),
+                                            Text(
+                                              DateFormat('MMM d').format(noteData.date),
                                                
                                                 style: GoogleFonts.roboto(
                                                     fontSize: 12,
@@ -293,16 +234,6 @@ class NoteCards extends StatelessWidget {
                                                     size: 16,
                                                   )
                                                 : const SizedBox.shrink(),
-                                            noteData.id != null
-                                                ? Padding(
-                                                  padding: const EdgeInsets.only(left:8.0),
-                                                  child: const Icon(
-                                                      Icons.cloud_done,
-                                                      size: 16,
-                                                      color: Colors.green,
-                                                    ),
-                                                )
-                                                : const SizedBox.shrink(),
                                           ],
                                         )
                                       ],
@@ -314,21 +245,6 @@ class NoteCards extends StatelessWidget {
                   ],
                 );
         }),
-      ),
-    );
-  }
-
-  encryptedNoteBuild(NoteModel noteData) {
-    return Container(
-      height: 100,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: ColorHelper.primaryColor),
-      child: Column(
-        children: [
-          const Text("Note is encrypted"),
-          ElevatedButton(onPressed: () {}, child: Text("View")),
-        ],
       ),
     );
   }
@@ -383,7 +299,7 @@ class NoteCards extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: 10),
         autoFocus: true,
         enableInteractiveSelection: false,
-        enableScribble: true,
+        // readOnly: true,
         showCursor: false,
         scrollPhysics: const NeverScrollableScrollPhysics(),
         scrollable: true,
@@ -393,27 +309,5 @@ class NoteCards extends StatelessWidget {
       scrollController: ScrollController(keepScrollOffset: false),
       focusNode: FocusNode(),
     );
-  }
-
-  navigateToNoteEditScreen(NoteModel noteData) async {
-    // todo decrypt before moving
-    String? decryptedData = noteData.document;
-    if (noteData.encrypted) {
-      decryptedData =
-          await notesController.performDecryption(noteData: noteData);
-      if (decryptedData == null) {
-        // DefaultSnackbar.show('Trouble', "Unable to view due to some error.");
-        return;
-      }
-    }
-
-    var json = jsonDecode(decryptedData);
-
-    notesController.quillController.document = quill.Document.fromJson(json);
-    notesController.titleController.text = noteData.title;
-    notesController.selectedFolder.value = noteData.folder;
-    notesController.labels.value = noteData.labels;
-    Get.to(CreateNote(
-        updateNote: noteData, folderName: folderName, labelName: labelName));
   }
 }

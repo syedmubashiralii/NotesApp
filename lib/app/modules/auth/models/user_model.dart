@@ -1,7 +1,8 @@
 import 'package:notes_final_version/app/utils/map_keys.dart';
 
 class UserModel {
-  String? email,
+  int? id;
+      String? email,
       username,
       password,
       passwordHint,
@@ -12,7 +13,8 @@ class UserModel {
       authToken;
 
   UserModel(
-      {this.email,
+      {this.id,
+        this.email,
       this.username,
       this.password,
       this.passwordHint,
@@ -24,6 +26,7 @@ class UserModel {
 
   // Factory constructor to create UserModel from a map
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
+    id: json[MapKey.userId],
         email: json[MapKey.userEmail],
         username: json[MapKey.userName],
         password: json[MapKey.userPassword],
@@ -33,7 +36,7 @@ class UserModel {
         recoveryQuestion: json[MapKey.userPasswordRecoveryQuestion],
         recoveryQuestionAnswer: json[MapKey.userPasswordRecoveryQuestionAnswer],
         authToken: json.containsKey(MapKey.userAuthToken)
-            ? json[MapKey.userPasswordRecoveryQuestionAnswer]
+            ? json[MapKey.userAuthToken]
             : null,
       );
 
@@ -60,6 +63,7 @@ class UserModel {
       'master_password': masterPassword,
       'recovery_question': recoveryQuestion,
       'recovery_question_answer': recoveryQuestionAnswer,
+      'authToken': authToken,
     };
     return data;
   }

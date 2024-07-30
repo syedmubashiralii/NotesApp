@@ -41,10 +41,12 @@ class _SecureStorageProvider {
 
   Future<UserModel?> readAllValues() async {
     if (userModel == null) {
+      
       Map<String, String> allValues = await _storage.readAll();
       logJSON(message: "all values", object: allValues);
       // if user exist then email will exist
-      if (allValues.containsKey(MapKey.userEmail)) {
+      if (allValues.containsKey(MapKey.userEmail)&&allValues.containsKey(MapKey.userAuthToken)) {
+        print('enter');
         userModel = UserModel.fromJson(allValues);
       } else {
         return null;

@@ -137,7 +137,7 @@ class CreateNote extends StatelessWidget {
                           sharedConfigurations:
                               HelperFunction.sharedConfigurations,
                           controller: notesController.quillController,
-                          readOnly: false,
+                          // readOnly: false,
                         ),
                         scrollController:
                             notesController.editorScrollController.value,

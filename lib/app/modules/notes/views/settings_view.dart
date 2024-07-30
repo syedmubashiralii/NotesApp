@@ -71,77 +71,77 @@ class SettingsView extends StatelessWidget {
                     })
                   ],
                 ),
-                10.spaceY,
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Select Theme",
-                      style: heading2Style,
-                    ),
-                    InkWell(
-                      onTap: () {
-                        HelperFunction.openColorPicker();
-                      },
-                      child: CircleAvatar(
-                        backgroundColor: ColorHelper.primaryColor,
-                        radius: 22,
-                      ),
-                    )
-                  ],
-                ),
-                20.spaceY,
-                Text(
-                  "Language",
-                  style: heading1Style,
-                ),
-                10.spaceY,
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "App Language",
-                      style: heading2Style,
-                    ),
-                    Obx(() {
-                      return Text(
-                        notesController.appLanguage.value,
-                        style: heading2Style,
-                      );
-                    })
-                  ],
-                ),
-                20.spaceY,
-                Text(
-                  "Sharing",
-                  style: heading1Style,
-                ),
-                10.spaceY,
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Enable Sharing",
-                      style: heading2Style,
-                    ),
-                    Obx(() {
-                      return CustomSwitch(
-                        value: sharingEnabled.value,
-                        onChanged: (value) {
-                          sharingEnabled.value = value;
-                        },
-                      );
-                      // CupertinoSwitch(
-                      //   activeColor: ColorHelper.primaryColor,
-                      //   thumbColor: ColorHelper.primaryColor,
-                      //   value: sharingEnabled.value,
-                      //   onChanged:  (value) {
-                      //                           sharingEnabled.value = value;
-                      //                         }
-                      // );
-                    })
-                  ],
-                ),
+                // 10.spaceY,
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //   children: [
+                //     Text(
+                //       "Select Theme",
+                //       style: heading2Style,
+                //     ),
+                //     InkWell(
+                //       onTap: () {
+                //         HelperFunction.openColorPicker();
+                //       },
+                //       child: CircleAvatar(
+                //         backgroundColor: ColorHelper.primaryColor,
+                //         radius: 22,
+                //       ),
+                //     )
+                //   ],
+                // ),
+                // 20.spaceY,
+                // Text(
+                //   "Language",
+                //   style: heading1Style,
+                // ),
+                // 10.spaceY,
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //   children: [
+                //     Text(
+                //       "App Language",
+                //       style: heading2Style,
+                //     ),
+                //     Obx(() {
+                //       return Text(
+                //         notesController.appLanguage.value,
+                //         style: heading2Style,
+                //       );
+                //     })
+                //   ],
+                // ),
+                // 20.spaceY,
+                // Text(
+                //   "Sharing",
+                //   style: heading1Style,
+                // ),
+                // 10.spaceY,
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //   children: [
+                //     Text(
+                //       "Enable Sharing",
+                //       style: heading2Style,
+                //     ),
+                //     Obx(() {
+                //       return CustomSwitch(
+                //         value: sharingEnabled.value,
+                //         onChanged: (value) {
+                //           sharingEnabled.value = value;
+                //         },
+                //       );
+                //       // CupertinoSwitch(
+                //       //   activeColor: ColorHelper.primaryColor,
+                //       //   thumbColor: ColorHelper.primaryColor,
+                //       //   value: sharingEnabled.value,
+                //       //   onChanged:  (value) {
+                //       //                           sharingEnabled.value = value;
+                //       //                         }
+                //       // );
+                //     })
+                //   ],
+                // ),
                 20.spaceY,
                 Text(
                   "Encrypt / Decrypt",
@@ -181,7 +181,7 @@ class SettingsView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
+                    Expanded( 
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
