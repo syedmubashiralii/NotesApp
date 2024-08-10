@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dio/dio.dart' as d;
 import 'package:flutter/material.dart';
@@ -12,7 +13,10 @@ import 'package:notes_final_version/app/modules/auth/models/user_model.dart';
 import 'package:notes_final_version/app/modules/notes/models/notes_model.dart';
 import 'package:notes_final_version/app/routes/app_pages.dart';
 import 'package:notes_final_version/app/utils/utils.dart';
-
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:share_plus/share_plus.dart';
 import '../../auth/services/encryptor_controller/encryptor_controller.dart';
 import '../models/note_plaintext_model.dart';
 
@@ -66,7 +70,7 @@ class NotesController extends GetxController {
   }
 
   void addUpdateNote(NoteModel newNote,
-      {String? folderName, String? labelName,bool? fromRestore}) async {
+      {String? folderName, String? labelName, bool? fromRestore}) async {
     bool found = false;
     int index = 0;
 
@@ -85,15 +89,15 @@ class NotesController extends GetxController {
     }
     if (found == false) {
       await addNote(newNote, folderName: folderName, labelName: labelName);
-      if(fromRestore!=null){
+      if (fromRestore != null) {
         DefaultSnackbar.show("Success", "Note Restored Successfully");
       }
     } else {
       await updateNote(index, newNote,
           folderName: folderName, labelName: labelName);
-           if(fromRestore!=null){
-              DefaultSnackbar.show("Success", "Note already available locally"); 
-           }   
+      if (fromRestore != null) {
+        DefaultSnackbar.show("Success", "Note already available locally");
+      }
     }
   }
 
@@ -288,13 +292,10 @@ class NotesController extends GetxController {
     }
   }
 
-
-   Future<UserModel?> verifyUserLoggedIn1() async {
+  Future<UserModel?> verifyUserLoggedIn1() async {
     try {
-
       //  Check user session
       UserModel? userModel = await _authController.checkUserExist();
-      
 
       return userModel;
     } catch (e) {
@@ -310,7 +311,7 @@ class NotesController extends GetxController {
       print("enter1");
       if (userModel != null) {
         print("enter2");
-       return await getAllBackedUpNotes();
+        return await getAllBackedUpNotes();
       } else {
         await authenticateUser();
         return false;
@@ -324,18 +325,19 @@ class NotesController extends GetxController {
           title: "Error",
           description: "There is some error, please try again later.");
 
-          return false;
+      return false;
     }
   }
+
   //send note to server for additon or updation
-  backupNote(NoteModel note,{String? folderName}) async {
+  backupNote(NoteModel note, {String? folderName}) async {
     try {
       print("enter");
       UserModel? userModel = await verifyUserLoggedIn1();
       print("enter1");
       if (userModel != null) {
         print("enter2");
-        backupSingleNote(note,folderName:folderName);
+        backupSingleNote(note, folderName: folderName);
         print("enter3");
       } else {
         await authenticateUser();
@@ -350,6 +352,7 @@ class NotesController extends GetxController {
           description: "There is some error, please try again later.");
     }
   }
+
   ///get all notes from server against loggedin user
   Future<bool> getAllBackedUpNotes() async {
     MyDialogs.showLoadingDialog(message: "Fetching Notes");
@@ -373,29 +376,27 @@ class NotesController extends GetxController {
     print(json.encode(response.data));
     if (response.statusCode == 200) {
       print(json.encode(response.data));
-      if(response.data["status"]==true){
-        for(var data in response.data["data"]['notes']){
+      if (response.data["status"] == true) {
+        for (var data in response.data["data"]['notes']) {
           backedUpNotesList.add(NoteModel.fromJson(data));
         }
         return true;
-      }  print(backedUpNotesList.length.toString());
+      }
+      print(backedUpNotesList.length.toString());
       return false;
-    
-      
     } else {
       print(response.statusMessage);
       return false;
     }
   }
 
-   Future deleteNoteFromCloud(NoteModel note) async {
+  Future deleteNoteFromCloud(NoteModel note) async {
     MyDialogs.showLoadingDialog(message: "Deleting note from cloud...");
     var headers = {
       'Accept': 'application/json',
       'X_API_KEY': 'KhurramShahzad',
       'Authorization': 'Bearer ${_authController.loggedInUser!.authToken ?? ""}'
     };
-   
 
     var dio = d.Dio();
     var response = await dio.request(
@@ -406,10 +407,10 @@ class NotesController extends GetxController {
       ),
     );
     MyDialogs.closeDialog();
-    if (response.statusCode == 200||response.statusCode==201) {
-      if(response.data["status"]==true){
-        note.id=null;
-        note.user_id=null;
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      if (response.data["status"] == true) {
+        note.id = null;
+        note.user_id = null;
         addUpdateNote(note);
         getAllBackedUpNotes();
       }
@@ -420,7 +421,7 @@ class NotesController extends GetxController {
     }
   }
 
-  Future backupSingleNote(NoteModel note,{String? folderName}) async {
+  Future backupSingleNote(NoteModel note, {String? folderName}) async {
     MyDialogs.showLoadingDialog(message: "Loading...");
     print("authtoken${_authController.loggedInUser!.authToken}??''");
     var headers = {
@@ -438,11 +439,11 @@ class NotesController extends GetxController {
       'folder': note.folder,
       'date': note.date.toString(),
       'uid': note.uid,
-      'is_archived': note.isArchived==true?'1':'0',
-      'is_pinned': note.isPinned==true?'1':'0',
+      'is_archived': note.isArchived == true ? '1' : '0',
+      'is_pinned': note.isPinned == true ? '1' : '0',
       'searchable_document': note.document,
-      'encrypted': note.encrypted==true?'1':'0',
-      'edited': note.edited==true?'1':'0',
+      'encrypted': note.encrypted == true ? '1' : '0',
+      'edited': note.edited == true ? '1' : '0',
       'id': note.id?.toString()
     });
 
@@ -458,13 +459,14 @@ class NotesController extends GetxController {
     MyDialogs.closeDialog();
     print(json.encode(response.data));
     print("here ${response.statusCode}");
-    if (response.statusCode == 200||response.statusCode==201) {
-      if(response.data["status"]==true){
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      if (response.data["status"] == true) {
         print("here2");
         DefaultSnackbar.show("Success", response.data["message"]);
-        note.id=int.parse(response.data["data"]["notes"]["id"].toString());
-        note.user_id=int.parse(response.data["data"]["notes"]["user_id"].toString());
-        addUpdateNote(note,folderName: folderName);
+        note.id = int.parse(response.data["data"]["notes"]["id"].toString());
+        note.user_id =
+            int.parse(response.data["data"]["notes"]["user_id"].toString());
+        addUpdateNote(note, folderName: folderName);
       }
       print(json.encode(response.data));
     } else {
@@ -705,6 +707,51 @@ class NotesController extends GetxController {
   Future<void> changeMasterPasswordStatus(bool value) async {
     _authController.changeMasterPasswordStatus(value);
   }
+
+  // sharePdf() async {
+  //   final pdf = pw.Document();
+  //   // Convert Quill Delta to JSON
+  //   final delta = quillController.document.toDelta().toJson();
+  //   pdf.addPage(
+  //     pw.Page(
+  //       build: (pw.Context context) {
+  //         return pw.Column(
+  //           crossAxisAlignment: pw.CrossAxisAlignment.start,
+  //           children: delta.map((op) {
+  //             if (op['insert'] is String) {
+  //               return pw.Text(op['insert']);
+  //             } else if (op['insert'] != null &&
+  //                 op['insert']['image'] != null) {
+  //               try {
+  //                 final imageData = base64Decode(op['insert']['image']);
+  //                 final image = pw.MemoryImage(imageData);
+  //                 return pw.Image(image);
+  //               } catch (e) {
+  //                 print('Error decoding image: $e');
+  //                 return pw
+  //                     .Container(); // Return empty container if image decoding fails
+  //               }
+  //             } else if (op['attributes'] != null &&
+  //                 op['attributes']['link'] != null) {
+  //               return pw.UrlLink(
+  //                 destination: op['attributes']['link'],
+  //                 child: pw.Text(op['insert']),
+  //               );
+  //             }
+  //             return pw.SizedBox
+  //                 .shrink(); // Return empty widget for unsupported content
+  //           }).toList(),
+  //         );
+  //       },
+  //     ),
+  //   );
+  //   // Save the PDF to a file
+  //   final output = await getTemporaryDirectory();
+  //   final file = File("${output.path}/note.pdf");
+  //   await file.writeAsBytes(await pdf.save());
+  //   // Share the PDF file
+  //   await Share.shareXFiles([XFile(file.path)], text: 'Here is my note!');
+  // }
 
   @override
   void dispose() {

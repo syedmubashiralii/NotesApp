@@ -494,6 +494,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.0"
+  flutter_html_to_pdf:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: master
+      resolved-ref: a48ca0d022520fa337d13cd9e0df8e167bed602e
+      url: "https://github.com/syedmubashiralii/flutter_html_to_pdf.git"
+    source: git
+    version: "0.7.0"
   flutter_inappwebview:
     dependency: transitive
     description:

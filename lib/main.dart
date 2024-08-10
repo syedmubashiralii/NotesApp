@@ -3,6 +3,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_quill/translations.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
@@ -37,6 +38,12 @@ Future<void> main() async {
             child: child!,
           );
         },
+        localizationsDelegates: const [
+          FlutterQuillLocalizations.delegate, 
+        ],
+        supportedLocales: const [
+          Locale('en', 'US'),
+        ],
         debugShowCheckedModeBanner: false,
         title: "KP Notes",
         initialRoute: AppPages.INITIAL,

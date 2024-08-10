@@ -112,13 +112,19 @@ class MyQuillToolbar extends StatelessWidget {
                           .updateSettings(
                               state.copyWith(useCustomQuillToolbar: false)),
                       icon: const Icon(
-                        Icons.width_normal,
+                        Icons.expand,
                       ),
                     ),
                     QuillToolbarHistoryButton(
                       isUndo: true,
                       controller: controller,
                     ),
+                    //  QuillToolbarImageButton(
+                    //   controller: controller,
+                    // ),
+                    // QuillToolbarCameraButton(
+                    //   controller: controller,
+                    // ),
                     QuillToolbarHistoryButton(
                       isUndo: false,
                       controller: controller,
@@ -140,17 +146,12 @@ class MyQuillToolbar extends StatelessWidget {
                     QuillToolbarClearFormatButton(
                       controller: controller,
                     ),
-                    const VerticalDivider(),
-                    QuillToolbarImageButton(
-                      controller: controller,
-                    ),
-                    QuillToolbarCameraButton(
-                      controller: controller,
-                    ),
-                    QuillToolbarVideoButton(
-                      controller: controller,
-                    ),
-                    const VerticalDivider(),
+                    // const VerticalDivider(),
+                   
+                    // QuillToolbarVideoButton(
+                    //   controller: controller,
+                    // ),
+                    // const VerticalDivider(),
                     QuillToolbarColorButton(
                       controller: controller,
                       isBackground: false,
@@ -159,11 +160,11 @@ class MyQuillToolbar extends StatelessWidget {
                       controller: controller,
                       isBackground: true,
                     ),
-                    const VerticalDivider(),
+                    // const VerticalDivider(),
                     QuillToolbarSelectHeaderStyleDropdownButton(
                       controller: controller,
                     ),
-                    const VerticalDivider(),
+                    // const VerticalDivider(),
                     QuillToolbarToggleCheckListButton(
                       controller: controller,
                     ),
@@ -191,7 +192,7 @@ class MyQuillToolbar extends StatelessWidget {
                       controller: controller,
                       isIncrease: false,
                     ),
-                    const VerticalDivider(),
+                    // const VerticalDivider(),
                     QuillToolbarLinkStyleButton(controller: controller),
                   ],
                 ),
