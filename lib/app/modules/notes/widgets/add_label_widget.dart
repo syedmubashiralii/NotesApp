@@ -68,7 +68,7 @@ class AddLabelBottomSheet extends StatelessWidget {
                 thickness: 2,
                 color: ColorHelper.primaryColor,
               ),
-              20.SpaceX,
+              20.spaceY,
               SizedBox(
                 width: Get.width,
                 height: 40,
@@ -125,7 +125,7 @@ class AddLabelBottomSheet extends StatelessWidget {
                                         : Text(labelsController
                                             .labelsList[index]!.name[0]
                                             .toString())),
-                                5.SpaceY,
+                                5.spaceX,
                                 Text(labelsController.labelsList[index]!.name),
                               ],
                             ),
@@ -136,14 +136,14 @@ class AddLabelBottomSheet extends StatelessWidget {
                   });
                 }),
               ),
-              20.SpaceX,
+              20.spaceY,
               GradientButton(
                   text: "Done",
                   icon: null,
                   onPress: () {
                     Get.back();
                   }),
-              20.SpaceX,
+              20.spaceY,
             ],
           ),
         ),

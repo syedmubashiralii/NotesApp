@@ -145,7 +145,7 @@ class FilterBottomSheet extends StatelessWidget {
                   ),
                 );
               }),
-              15.SpaceX,
+              15.spaceY,
               GradientButton(
                   text: "Apply Filter",
                   icon: null,
@@ -153,7 +153,7 @@ class FilterBottomSheet extends StatelessWidget {
                     notesController.searchController.value.text = "";
                     Get.back();
                   }),
-              30.SpaceX,
+              30.spaceY,
             ],
           ),
         ),

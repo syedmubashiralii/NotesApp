@@ -32,7 +32,10 @@ class RemindersViewState extends State<RemindersView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Reminder'), actions: [
+      backgroundColor: ColorHelper.primaryColor,
+      appBar: AppBar(
+         backgroundColor: ColorHelper.primaryColor,
+        title: const Text('Reminder'), actions: [
         IconButton(
             icon: const Icon(CupertinoIcons.delete),
             onPressed: () async {
@@ -46,6 +49,7 @@ class RemindersViewState extends State<RemindersView> {
         return ListView(
           children: <Widget>[
             ExpansionPanelList(
+              
               expansionCallback: (int index, bool isExpanded) {
                 remindersController.remindersList[index]!.isExpanded =
                     !remindersController.remindersList[index]!.isExpanded;
@@ -101,30 +105,30 @@ class RemindersViewState extends State<RemindersView> {
                                   ),
                                 )),
                               ),
-                              IconButton(
-                                  icon: const Icon(
-                                    Icons.edit,
-                                  ),
-                                  color: ColorHelper.primaryDarkColor,
-                                  onPressed: () {
-                                    // editReminder(reminders.indexOf(item));
-                                  }),
-                              IconButton(
-                                  color: ColorHelper.primaryDarkColor,
-                                  icon: const Icon(
-                                    Icons.event,
-                                  ),
-                                  onPressed: () {
-                                    // editDate(context, reminders.indexOf(item));
-                                  }),
-                              IconButton(
-                                  color: ColorHelper.primaryDarkColor,
-                                  icon: const Icon(
-                                    Icons.access_time,
-                                  ),
-                                  onPressed: () {
-                                    // editTime(context, reminders.indexOf(item));
-                                  }),
+                              // IconButton(
+                              //     icon: const Icon(
+                              //       Icons.edit,
+                              //     ),
+                              //     color: ColorHelper.primaryDarkColor,
+                              //     onPressed: () {
+                              //       // editReminder(reminders.indexOf(item));
+                              //     }),
+                              // IconButton(
+                              //     color: ColorHelper.primaryDarkColor,
+                              //     icon: const Icon(
+                              //       Icons.event,
+                              //     ),
+                              //     onPressed: () {
+                              //       // editDate(context, reminders.indexOf(item));
+                              //     }),
+                              // IconButton(
+                              //     color: ColorHelper.primaryDarkColor,
+                              //     icon: const Icon(
+                              //       Icons.access_time,
+                              //     ),
+                              //     onPressed: () {
+                              //       // editTime(context, reminders.indexOf(item));
+                              //     }),
                               IconButton(
                                 icon: const Icon(CupertinoIcons.delete),
                                 color: Colors.red,

@@ -41,7 +41,7 @@ class HomeSearchWidget extends StatelessWidget {
             ),
           ),
         ),
-        5.SpaceY,
+        5.spaceX,
         Expanded(child: Obx(() {
           return Container(
             padding: const EdgeInsets.symmetric(horizontal: 8),

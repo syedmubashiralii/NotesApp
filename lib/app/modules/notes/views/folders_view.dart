@@ -28,7 +28,7 @@ class FoldersView extends StatelessWidget {
               style: GoogleFonts.poppins(
                   fontSize: 22, fontWeight: FontWeight.w600),
             ),
-            20.SpaceX,
+            20.spaceY,
             Expanded(
               child: Obx(() {
                 return ListView.separated(

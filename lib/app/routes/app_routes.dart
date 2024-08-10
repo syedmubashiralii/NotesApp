@@ -4,13 +4,15 @@ part of 'app_pages.dart';
 abstract class Routes {
   Routes._();
   static const HOME = _Paths.HOME;
-  static const TODO = _Paths.TODO;
+  // static const TODO = _Paths.TODO;
   static const REMINDERS = _Paths.REMINDERS;
+  static const AUTH = _Paths.AUTH;
 }
 
 abstract class _Paths {
   _Paths._();
   static const HOME = '/home';
-  static const TODO = '/todo';
+  // static const TODO = '/todo';
   static const REMINDERS = '/reminders';
+  static const AUTH = '/auth';
 }

@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 
+import '../modules/auth/bindings/auth_binding.dart';
+import '../modules/auth/views/auth_view.dart';
 import '../modules/notes/bindings/notes_binding.dart';
 import '../modules/notes/views/home_view.dart';
 import '../modules/reminders/bindings/reminders_binding.dart';
@@ -20,15 +22,20 @@ class AppPages {
       page: () => HomeView(),
       binding: NotesBinding(),
     ),
-    GetPage(
-      name: _Paths.TODO,
-      page: () => const TodoView(),
-      binding: TodoBinding(),
-    ),
+    // GetPage(
+    //   name: _Paths.TODO,
+    //   page: () => const TodoView(),
+    //   binding: TodoBinding(),
+    // ),
     GetPage(
       name: _Paths.REMINDERS,
       page: () => const RemindersView(),
       binding: RemindersBinding(),
+    ),
+    GetPage(
+      name: _Paths.AUTH,
+      page: () => const AuthView(),
+      binding: AuthBinding(),
     ),
   ];
 }

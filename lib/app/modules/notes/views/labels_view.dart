@@ -122,7 +122,7 @@ class LabelsView extends StatelessWidget {
                   ),
                 );
               }),
-              10.SpaceX,
+              10.spaceY,
               Expanded(child: Obx(() {
                 return ListView.builder(
                   itemCount: labelsController.labelsList.length,

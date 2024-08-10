@@ -36,7 +36,7 @@ class FolderMenu extends StatelessWidget {
                           Icons.folder,
                           color: Colors.amber,
                         ),
-                        10.SpaceY,
+                        10.spaceX,
                         Container(
                             constraints: const BoxConstraints(maxWidth: 150),
                             child: Text(

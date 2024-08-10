@@ -35,7 +35,7 @@ class HomeView extends StatelessWidget {
         closeCurve: Curves.bounceIn,
         angle: -12.0,
         drawerShadowsBackgroundColor: Colors.grey,
-        slideWidth: MediaQuery.of(context).size.width * 0.7,
+        slideWidth:  Get.width * 0.7,
       )),
     );
   }
@@ -96,7 +96,7 @@ class MainScreen extends StatelessWidget {
                   notesController.labels.value = [];
                   Get.to(() => CreateNote());
                 },
-                icon: const Icon(FontAwesomeIcons.edit))
+                icon: const Icon(FontAwesomeIcons.penToSquare))
           ],
         ),
       ),

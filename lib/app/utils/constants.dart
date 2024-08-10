@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:notes_final_version/app/utils/color_helper.dart';
 
 class AppConstants {
+  static const String BASE_URL = "https://grandmarecipes.click/KpNotes/public";
   static double kDefaultSpace = 8.0;
   static double kInputBorderRadius = 8;
   static double kScreenPadding = 6.0;
@@ -34,4 +35,9 @@ const String assetImagePath = "assets/images";
 class ImageAsset {
   static const String filterIcon = "$assetImagePath/filter.svg";
   static const String notesIcon = '$assetImagePath/icons8-notes.png';
+}
+
+class MapKeys {
+  static String selectedProductImageList = "selectedProductImageList";
+  static String selectedProductId = "selectedProductId";
 }
